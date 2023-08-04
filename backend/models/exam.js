@@ -48,7 +48,7 @@ Exam.belongsTo(user, {
 // M:N - student-exam
 user.belongsToMany(Exam, {
   through: 'UserExam', 
-  foreignKey: 'studentID', 
+  foreignKey: 'userID', 
   timestamps: false
 });
 Exam.belongsToMany(user, {
