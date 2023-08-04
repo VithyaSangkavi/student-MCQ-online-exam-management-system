@@ -37,4 +37,24 @@ const Exam = sequelize.define('exam', {
   timestamps: false
 });
 
+// 1:N - teacher-exam
+user.hasMany(Exam, {
+  foreignKey: 'userID'
+});
+Exam.belongsTo(user, {
+  foreignKey: 'userID'
+});
+
+// M:N - student-exam
+user.belongsToMany(Exam, {
+  through: 'UserExam', 
+  foreignKey: 'studentID', 
+  timestamps: false
+});
+Exam.belongsToMany(user, {
+  through: 'UserExam', 
+  foreignKey: 'examID', 
+  timestamps: false,
+});
+
 module.exports = Exam;
