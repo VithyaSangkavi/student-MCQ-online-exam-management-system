@@ -1,5 +1,6 @@
 const User  = require('../models/user.js'); 
 const { bcrypt, saltRounds } = require('../configs/bcrypt.js'); 
+const jwt = require('jsonwebtoken');
 
 const createUser = async (req, res) => {
   try {
@@ -72,10 +73,35 @@ const deleteUserById = async (req, res) => {
   }
 };
 
+const loginUser = async (req, res) => {
+  try {
+    const { userEmail, password } = req.body;
+
+    const user = await User.findOne({ where: { userEmail } });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ id: user.userID, email: user.userEmail }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+
+    res.json({ token });
+  } catch (error) {
+    console.error('Error logging in:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   createUser,
   getAllUsers,
   getUserById,
   updateUserById,
-  deleteUserById
+  deleteUserById,
+  loginUser
 };
