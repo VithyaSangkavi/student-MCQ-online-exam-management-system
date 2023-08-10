@@ -15,7 +15,7 @@ function TeacherInterface() {
 
     const teacherExams = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/exams'); // Update the endpoint
+            const response = await axios.get('http://localhost:3000/exams');
             console.log('Fetched exams:', response.data);
             setExams(response.data);
         } catch (error) {
