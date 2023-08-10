@@ -1,10 +1,39 @@
-function StudentInterface(){
-    return(
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import SearchBar from '../components/searchBar';
+
+function StudentInterface() {
+    const [exams, setExams] = useState([]);
+    const [filteredExams, setFilteredExams] = useState([]);
+    const [searchClicked, setSearchClicked] = useState(false);
+
+    useEffect(() => {
+        fetchExams();
+    }, []);
+
+    const fetchExams = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/exams'); // Update the endpoint
+            console.log('Fetched exams:', response.data);
+            setExams(response.data);
+        } catch (error) {
+            console.error('Error fetching exams:', error);
+        }
+    };
+
+    const handleSearch = (query) => {
+        const filtered = exams.filter((exam) => {
+            return exam.examID.toString().toLowerCase().includes(query.toLowerCase());
+        });
+        setFilteredExams(filtered);
+        setSearchClicked(true);
+    };
+
+    return (
         <>
-        <div className="py-4 px-6 flex justify-between items-center">
+            <div className="py-4 px-6 flex justify-between items-center">
                 <div className="flex items-center">
-                    <input type="text"className="py-2 px-3 border-2 border[#1F2937] h-[35px]" />
-                    <button className='rounded bg-[#5850EC] pr-10 pl-10 pt-2 pb-2 text-white h-[35px] font-bold ml-[15px]'>Search</button>
+                    <SearchBar onSearch={handleSearch} />
                 </div>
             </div>
 
@@ -19,18 +48,14 @@ function StudentInterface(){
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="border-2">
-                            <td className="py-2 px-4">Math Exam</td>
-                            <td className="py-2 px-4">2023-08-09 09.00am</td>
-                            <td className="py-2 px-4">60 minutes</td>
-                            <td className="py-2 px-4">Attended</td>
-                        </tr>
-                        <tr className="border-2">
-                            <td className="py-2 px-4">Science Exam</td>
-                            <td className="py-2 px-4">2023-08-08 10.00am</td>
-                            <td className="py-2 px-4">30 minutes</td>
-                            <td className="py-2 px-4">Pending</td>
-                        </tr>
+                        {(searchClicked ? filteredExams : exams).map((exam) => (
+                            <tr key={exam.id} className="border-2">
+                                <td className="py-2 px-4">{exam.examName}</td>
+                                <td className="py-2 px-4">{exam.startDateAndTime}</td>
+                                <td className="py-2 px-4">{exam.duration} minutes</td>
+                                <td className="py-2 px-4">{exam.examStatus}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

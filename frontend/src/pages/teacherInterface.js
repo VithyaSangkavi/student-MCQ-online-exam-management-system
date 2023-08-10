@@ -1,13 +1,45 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import SearchBar from '../components/searchBar';
 
 function TeacherInterface() {
+    const [exams, setExams] = useState([]);
+    const [filteredExams, setFilteredExams] = useState([]);
+    const [searchClicked, setSearchClicked] = useState(false);
+
+    useEffect(() => {
+        teacherExams();
+    }, []);
+
+    const teacherExams = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/exams'); // Update the endpoint
+            console.log('Fetched exams:', response.data);
+            setExams(response.data);
+        } catch (error) {
+            console.error('Error fetching exams:', error);
+        }
+    };
+
+    const handleSearch = (query) => {
+        const filtered = exams.filter((exam) => {
+            return exam.examID.toString().toLowerCase().includes(query.toLowerCase());
+        });
+        setFilteredExams(filtered);
+        setSearchClicked(true);
+    };
+    
+
     return (
         <>
-           <div className="py-4 px-6 flex justify-between items-center">
+            <div className="py-4 px-6 flex justify-between items-center">
                 <div className="flex items-center">
-                    <input type="text"className="py-2 px-3 border-2 border[#1F2937] h-[35px]" />
-                    <button className='rounded bg-[#5850EC] pr-10 pl-10 pt-2 pb-2 text-white h-[35px] font-bold ml-[15px]'>Search</button>
+                    <SearchBar onSearch={handleSearch} />
+                    {/* <button className='rounded bg-[#5850EC] pr-10 pl-10 pt-2 pb-2 text-white h-[35px] font-bold ml-[15px]'>Search</button> */}
                 </div>
-                <button className="py-2 px-4 bg-[#31C48D] rounded text-white font-bold">New Exam</button>
+                <button className="py-2 px-4 bg-[#31C48D] rounded text-white font-bold"> <Link to="/addExam"> New Exam </Link></button>
             </div>
 
             <div className="m-4">
@@ -20,17 +52,15 @@ function TeacherInterface() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="border-2">
-                            <td className="py-2 px-4">Math Exam</td>
-                            <td className="py-2 px-4">2023-08-09</td>
-                            <td className="py-2 px-4">Active</td>
-                        </tr>
-                        <tr className="border-2">
-                            <td className="py-2 px-4">Science Exam</td>
-                            <td className="py-2 px-4">2023-08-08</td>
-                            <td className="py-2 px-4">Inactive</td>
-                        </tr>
+                        {(searchClicked ? filteredExams : exams).map((exam) => (
+                            <tr key={exam.id} className="border-2">
+                                <td className="py-2 px-4">{exam.examName}</td>
+                                <td className="py-2 px-4">{new Date().toLocaleString()}</td>
+                                <td className="py-2 px-4">{exam.examStatus}</td>
+                            </tr>
+                        ))}
                     </tbody>
+
                 </table>
             </div>
         </>
