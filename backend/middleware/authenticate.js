@@ -11,13 +11,17 @@ const authenticate = async (req, res, next) => {
 
   try {
     const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const user = await User.findByPk(decoded.id); // Assuming you have a findByPk method
+    const user = await User.findByPk(decoded.id); 
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid user' });
     }
 
-    req.user = user;
+    req.user = {
+      id: user.id,
+      userType: user.userType,
+    };
+
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
