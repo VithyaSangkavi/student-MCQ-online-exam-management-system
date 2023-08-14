@@ -7,27 +7,89 @@ function AddExam() {
     const [duration, setDuration] = useState('');
     const [examStatus, setExamStatus] = useState('');
     const [totalMarks, setTotalMarks] = useState('');
-
     const [questionNo, setQuestionNo] = useState('');
     const [questionText, setQuestionText] = useState('');
     const [questionMarks, setQuestionMarks] = useState('');
 
     const [answerValue, setAnswerValue] = useState(['', '', '', '']);
-    const [correctAnswer, setCorrectAnswer] = useState(0);
+    const [correctAnswer, setCorrectAnswer] = useState(-1);
 
-    const handleAddQuestion = async () => {
+
+
+    //Fetch Questions
+
+    const [questions, setQuestions] = useState([]);
+
+    useEffect(() => {
+        fetchQuestions();
+    }, [questions]);
+
+    const fetchQuestions = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/questions');
+            console.log('Fetched questions:', response.data);
+            setQuestions(response.data);
+        } catch (error) {
+            console.error('Error fetching questions:', error);
+        }
+    };
+
+    //Fetch Answers
+
+    const [answers, setAnswers] = useState([]);
+
+    const fetchAnswers = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/answers');
+            console.log('Fetched answers:', response.data);
+            setAnswers(response.data);
+        } catch (error) {
+            console.error('Error fetching answers:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchAnswers();
+    }, [answers])
+
+
+
+    const handleAddQuestion = async (e) => {
+        e.preventDefault();
+
         console.log('Question Text:', questionText);
         console.log('Answer Values:', answerValue);
+        console.log('Correct Answer:', correctAnswer);
+
         try {
             const questionData = {
-                text: questionText,
-                answers: answerValue,
+                questionText: questionText
             };
+
             const response = await axios.post('http://localhost:3000/questions', questionData);
             console.log('Question added:', response.data);
+
+            const questionID = response.data.questionID;
+
+            const answerPromises = answerValue.map((answer, index) => {
+                const answerData = {
+                    answerValue: answer,
+                    questionID: questionID,
+                    correctAnswer: index === correctAnswer // Mark correct answer
+                };
+                return axios.post('http://localhost:3000/answers', answerData);
+            });
+
+            const responses = await Promise.all(answerPromises);
+            console.log('Answers added:', responses.map((response) => response.data));
+
         } catch (error) {
             console.error('Error adding question:', error);
         }
+
+        setAnswerValue(['', '', '', '']);
+        setQuestionText('');
+        setCorrectAnswer(-1)
     };
 
 
@@ -43,6 +105,9 @@ function AddExam() {
         } catch (error) {
             console.error('Error adding exam:', error);
         }
+
+        setStartDateAndTime('');
+        setDuration('');
     };
 
     const handleAnswerChange = (index, value) => {
@@ -52,24 +117,9 @@ function AddExam() {
     };
 
     const handleCorrectAnswerChange = (index) => {
-        setCorrectAnswer(index);
+        setCorrectAnswer((prevIndex) => (prevIndex === index ? -1 : index));
     };
 
-    const [questions, setQuestions] = useState([]); 
-
-    useEffect(() => {
-        fetchQuestions();
-    }, []);
-
-    const fetchQuestions = async () => {
-        try {
-            const response = await axios.get('http://localhost:3000/questions');
-            console.log('Fetched questions:', response.data);
-            setQuestions(response.data);
-        } catch (error) {
-            console.error('Error fetching questions:', error);
-        }
-    };
 
     return (
         <>
@@ -93,7 +143,7 @@ function AddExam() {
                                 {questions.map((question) => (
                                     <tr key={question.id}>
                                         <td className="p-2 border-t border-gray-300">{question.questionText}</td>
-                                        <td className="p-2 border-t border-gray-300"></td>
+                                        <td className="p-2 border-t border-gray-300"><div className='grid'>{answers.map((answer) => (<div> {answer.questionID === question.questionID ? answer.answerValue : null}</div>))}</div></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -101,8 +151,8 @@ function AddExam() {
                     </div>
                     <br />
                     <div className="flex items-center mt-4">
-                        <input type="number" className="border border-gray-300 px-3 py-2 mr-8 rounded w-[350px]" placeholder="Exam Date Time" onChange={(e) => setStartDateAndTime(e.target.value)} />
-                        <input type="number" className="border border-gray-300 px-3 py-2 mr-16 rounded w-[350px]" placeholder="Exam Duration." onChange={(e) => setDuration(e.target.value)} />
+                        <input type="datetime-local" className="border border-gray-300 px-3 py-2 mr-8 rounded w-[350px]" placeholder="Exam Date Time" value={startDateAndTime} onChange={(e) => setStartDateAndTime(e.target.value)} />
+                        <input type="number" className="border border-gray-300 px-3 py-2 mr-16 rounded w-[350px]" placeholder="Exam Duration." value={duration} onChange={(e) => setDuration(e.target.value)} />
                         <button className="bg-[#6C2BD9] text-white px-4 py-2 rounded font-bold w-[300px]" onClick={handleAddExam}>Publish Paper</button>
                     </div>
                 </div>
@@ -110,22 +160,25 @@ function AddExam() {
                 <div className="w-1/3 bg-white p-4">
                     <form className="border-2 p-[20px] h-[550px]">
                         <div className="mb-3">
-                            <input type="text" className="w-full border border-gray-300 px-3 py-2 rounded" placeholder="Question name" onChange={(e) => setQuestionText(e.target.value)} />
+                            <input type="text" className="w-full border border-gray-300 px-3 py-2 rounded" placeholder="Question name" value={questionText} onChange={(e) => setQuestionText(e.target.value)} />
                         </div>
                         <br />
 
                         <div className="mb-3">
                             <label for="answer1" className="block mb-1">Answer List</label> <br />
                             {answerValue.map((value, index) => (
-                                <input
-                                    key={index}
-                                    type="text"
-                                    id={`answer${index + 1}`}
-                                    className="w-full border border-gray-300 px-3 py-2 rounded mb-[20px]"
-                                    placeholder={`Answer ${index + 1}`}
-                                    value={value}
-                                    onChange={(e) => handleAnswerChange(index, e.target.value)}
-                                />
+                                <div key={index}>
+                                    <input
+                                        type="text"
+                                        id={`answer${index + 1}`}
+                                        className={`w-full border border-gray-300 px-3 py-2 rounded mb-[20px] ${correctAnswer === index ? 'bg-green-100' : ''
+                                            }`}
+                                        placeholder={`Answer ${index + 1}`}
+                                        value={value}
+                                        onClick={() => handleCorrectAnswerChange(index)}
+                                        onChange={(e) => handleAnswerChange(index, e.target.value)}
+                                    />
+                                </div>
                             ))}
                         </div>
 

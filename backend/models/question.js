@@ -15,9 +15,6 @@ const Question = sequelize.define('question', {
   questionText: {
     type: DataTypes.TEXT,
   },
-  questionMarks: {
-    type: DataTypes.FLOAT,
-  },
   examID: {
     type: DataTypes.INTEGER,
     references: {

@@ -3,7 +3,7 @@ const router = express.Router();
 const examController = require('../controllers/exam.controller.js');
 const authenticate = require('../middleware/authenticate.js')
 
-router.post('/', authenticate, examController.createExam);
+router.post('/', examController.createExam);
 router.get('/', examController.getAllExams);
 router.get('/:id', authenticate, examController.getExamById);
 router.put('/:id', authenticate, examController.updateExamById);
