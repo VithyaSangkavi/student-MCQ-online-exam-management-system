@@ -3,11 +3,18 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import SearchBar from '../components/searchBar';
+import { useNavigate } from 'react-router-dom';
 
 function TeacherInterface() {
+    const navigate = useNavigate();
+
     const [exams, setExams] = useState([]);
     const [filteredExams, setFilteredExams] = useState([]);
     const [searchClicked, setSearchClicked] = useState(false);
+    
+    const [examName, setExamName] = useState('');
+    const [startDateAndTime, setStartDateAndTime] = useState('');
+    const [duration, setDuration] = useState('');
 
     useEffect(() => {
         teacherExams();
@@ -31,6 +38,31 @@ function TeacherInterface() {
         setSearchClicked(true);
     };
     
+    const createExam = async () => {
+        try {
+            const examData = {
+                examName: null,
+                startDateAndTime: null,
+                duration: null,
+                examStatus: 'Draft'
+            };
+
+            const response = await axios.post('http://localhost:3000/exams', examData);
+            console.log('Exam added:', response.data);
+            localStorage.setItem("ExamID", response.data.examID)
+
+            navigate('/addExam');
+
+        } catch (error) {
+            console.error('Error adding exam:', error);
+        }
+    };
+
+    const viewExam = (pExamID) => {
+        localStorage.setItem("ExamID", pExamID);
+        navigate('/addExam');
+    };
+
 
     return (
         <>
@@ -39,7 +71,7 @@ function TeacherInterface() {
                     <SearchBar onSearch={handleSearch} />
                     {/* <button className='rounded bg-[#5850EC] pr-10 pl-10 pt-2 pb-2 text-white h-[35px] font-bold ml-[15px]'>Search</button> */}
                 </div>
-                <button className="py-2 px-4 bg-[#31C48D] rounded text-white font-bold"> <Link to="/addExam"> New Exam </Link></button>
+                <button className="py-2 px-4 bg-[#31C48D] rounded text-white font-bold" onClick={createExam}> New Exam </button>
             </div>
 
             <div className="m-4">
@@ -53,11 +85,13 @@ function TeacherInterface() {
                     </thead>
                     <tbody>
                         {(searchClicked ? filteredExams : exams).map((exam) => (
-                            <tr key={exam.id} className="border-2">
-                                <td className="py-2 px-4">{exam.examName}</td>
+                           
+                           <tr key={exam.id} className="border-2">
+                                <button onClick={() => {viewExam(exam.examID)}}><td className="py-2 px-4">{exam.examName}</td> </button>
                                 <td className="py-2 px-4">{new Date().toLocaleString()}</td>
                                 <td className="py-2 px-4">{exam.examStatus}</td>
                             </tr>
+                            
                         ))}
                     </tbody>
 

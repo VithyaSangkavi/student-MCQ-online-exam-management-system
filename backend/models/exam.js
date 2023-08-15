@@ -22,9 +22,6 @@ const Exam = sequelize.define('exam', {
     type: DataTypes.ENUM('Published', 'Draft'),
     defaultValue: 'Draft',
   },
-  totalMarks: {
-    type: DataTypes.FLOAT
-  },
   userID: {
     type: DataTypes.INTEGER,
     references: {

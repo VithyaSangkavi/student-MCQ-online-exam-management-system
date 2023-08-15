@@ -2,8 +2,8 @@ const Exam  = require('../models/exam.js');
 
 const createExam = async (req, res) => {
   try {
-    const { examID, examName, startDateAndTime, duration, examStatus, totalMarks, userID} = req.body;
-    const newExam = await Exam.create({ examID, examName, startDateAndTime, duration, examStatus, totalMarks, userID });
+    const { examID, examName, startDateAndTime, duration, examStatus, userID} = req.body;
+    const newExam = await Exam.create({ examID, examName, startDateAndTime, duration, examStatus, userID });
     res.status(201).json(newExam);
   } catch (error) {
     console.error('Error creating exam:', error.message);
@@ -38,7 +38,7 @@ const getExamById = async (req, res) => {
 
 const updateExamById = async (req, res) => {
   const { id } = req.params;
-  const { examName, startDateAndTime, duration, examStatus, totalMarks, userID } = req.body;
+  const { examName, startDateAndTime, duration, examStatus, userID } = req.body;
   try {
     const exam = await Exam.findByPk(id);
     if (exam) {
