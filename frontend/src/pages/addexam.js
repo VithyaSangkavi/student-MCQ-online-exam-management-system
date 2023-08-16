@@ -16,6 +16,7 @@ function AddExam() {
     const [answerValue, setAnswerValue] = useState(['', '', '', '']);
     const [correctAnswer, setCorrectAnswer] = useState(-1);
 
+    
     //Fetch Questions
 
     const [questions, setQuestions] = useState([]);
@@ -164,7 +165,6 @@ function AddExam() {
                     <div className="flex items-center mt-4">
                         <input type="datetime-local" className="border border-gray-300 px-3 py-2 mr-8 rounded w-[350px]" placeholder="Exam Date Time" value={startDateAndTime} onChange={(e) => setStartDateAndTime(e.target.value)} />
                         <input type="number" className="border border-gray-300 px-3 py-2 mr-16 rounded w-[350px]" placeholder="Exam Duration." value={duration} onChange={(e) => setDuration(e.target.value)} />
-                        <button className="bg-[#31C48D] text-white px-4 py-2 rounded font-bold w-[300px] mr-16" >Save as draft</button>
                         <button className="bg-[#6C2BD9] text-white px-4 py-2 rounded font-bold w-[300px]" onClick={handleAddExam}>Publish Paper</button>
                     </div>
                 </div>

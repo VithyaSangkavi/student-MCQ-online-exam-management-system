@@ -35,7 +35,7 @@ function StudentInterface() {
     };
 
     const viewExam = (pExamID) => {
-        localStorage.setItem("ExamID", pExamID);
+        localStorage.setItem("stuExamID", pExamID);
         navigate('/examPaper');
     };
 
