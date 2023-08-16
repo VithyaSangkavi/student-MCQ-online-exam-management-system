@@ -5,8 +5,9 @@ const authenticate = require('../middleware/authenticate.js')
 
 router.post('/', questionController.createQuestion);
 router.get('/', questionController.getAllQuestions);
-router.get('/:id', authenticate, questionController.getQuestionById);
+router.get('/:id', questionController.getQuestionById);
 router.put('/:id', authenticate, questionController.updateQuestionById);
 router.delete('/:id', authenticate, questionController.deleteQuestionById);
+router.get('/exam/:examID', questionController.getQuestionByExamId);
 
 module.exports = router;

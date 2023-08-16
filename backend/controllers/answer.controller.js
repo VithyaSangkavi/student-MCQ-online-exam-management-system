@@ -70,10 +70,26 @@ const deleteAnswerById = async (req, res) => {
   }
 };
 
+const getAnswerByQuestionID = async (req, res) => {
+  const { questionID } = req.params;
+  
+  try {
+    const answers = await Answer.findAll({
+      where: { questionID }, 
+    });
+    
+    res.status(200).json(answers);
+  } catch (error) {
+    console.error('Error fetching answers by exam ID:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   createAnswer,
   getAllAnswers,
   getAnswerById,
   updateAnswerById,
   deleteAnswerById,
+  getAnswerByQuestionID
 };
