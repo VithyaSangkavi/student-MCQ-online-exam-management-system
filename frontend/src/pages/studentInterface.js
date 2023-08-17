@@ -16,9 +16,16 @@ function StudentInterface() {
 
     const fetchExams = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/exams');
+            const token = localStorage.getItem('token');
+
+            const response = await axios.get('http://localhost:3000/exams', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
             console.log('Fetched exams:', response.data);
-     
+
             const publishedExams = response.data.filter(exam => exam.examStatus === 'Published');
             setExams(publishedExams);
         } catch (error) {
@@ -35,7 +42,7 @@ function StudentInterface() {
     };
 
     const viewExam = (pExamID) => {
-        localStorage.setItem("stuExamID", pExamID);
+        localStorage.setItem("StuExamID", pExamID);
         navigate('/examPaper');
     };
 
@@ -60,7 +67,7 @@ function StudentInterface() {
                     <tbody>
                         {(searchClicked ? filteredExams : exams).map((exam) => (
                             <tr key={exam.id} className="border-2">
-                                <button onClick={() => {viewExam(exam.examID)}}> <td className="py-2 px-4">{exam.examName}</td> </button>
+                                <button onClick={() => { viewExam(exam.examID) }}> <td className="py-2 px-4">{exam.examName}</td> </button>
                                 <td className="py-2 px-4">{exam.startDateAndTime}</td>
                                 <td className="py-2 px-4">{exam.duration} minutes</td>
                                 <td className="py-2 px-4">{exam.examStatus}</td>
