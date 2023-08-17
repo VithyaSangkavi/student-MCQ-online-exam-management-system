@@ -3,7 +3,7 @@ const router = express.Router();
 const resultController = require('../controllers/results.controller.js');
 const authenticate = require('../middleware/authenticate.js')
 
-router.post('/', authenticate, resultController.createResult);
+router.post('/', resultController.createResult);
 router.get('/', authenticate, resultController.getAllResults);
 router.get('/:id', authenticate, resultController.getResultById);
 router.put('/:id', authenticate, resultController.updateResultById);

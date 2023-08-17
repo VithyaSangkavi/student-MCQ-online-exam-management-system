@@ -16,6 +16,10 @@ function LoginForm() {
         password: password,
       });
 
+      const userID = response.data.userID;
+
+      localStorage.setItem('userID', userID);
+
       if (response.status === 200) {
         const data = response.data;
         localStorage.setItem('token', data.token);
@@ -39,7 +43,6 @@ function LoginForm() {
       alert('An error occurred while logging in');
     }
   };
-
 
   return (
     <>
