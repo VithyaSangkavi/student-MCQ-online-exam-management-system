@@ -1,4 +1,33 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
 function ExamPaperSummary() {
+    const [studentsCount, setStudentsCount] = useState(0);
+    const [completedStudentsCount, setCompletedStudentsCount] = useState(0);
+
+    useEffect(() => {
+        axios.get('http://localhost:3000/users')
+            .then(response => {
+                const users = response.data;
+                const studentUsers = users.filter(user => user.userType === 'Student');
+                const totalStudents = studentUsers.length;
+                setStudentsCount(totalStudents);
+
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
+
+        axios.get('http://localhost:3000/results')
+            .then(response => {
+                const results = response.data;
+                const completedStudents = results.filter(result => result.examStatusStudent === 'Completed').length;
+                setCompletedStudentsCount(completedStudents);
+            })
+            .catch(error => {
+                console.error('Error fetching results:', error);
+            });
+    }, []);
     return (
         <>
             {/* <div class="flex flex-col h-screen p-8"> */}
@@ -9,7 +38,7 @@ function ExamPaperSummary() {
                 <div class="w-3/5 mr-4">
                     <div class="border-2 p-[20px]">
                         <p class="font-semibold">Exam completed</p>
-                        <p class="text-center text-7xl">10/20 </p>
+                        <p class="text-center text-7xl">{completedStudentsCount}/{studentsCount} </p>
                         <p class="text-center mt-4">Time left: 00:30 mins</p>
                     </div>
                     <div class="border-2 p-[20px] h-[200px] mt-6">
