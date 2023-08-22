@@ -7,7 +7,7 @@ const questionRoutes = require('./routes/question.routes.js');
 const answerRoutes = require('./routes/answer.routes.js');
 const resultsRoutes = require('./routes/results.routes.js');
 const studentAnswerRoutes = require('./routes/student_answer.routes.js');
-
+const examTimeRoutes = require('./routes/exam_time.routes.js')
 const app = express();
 const PORT = 3000;
 
@@ -20,6 +20,7 @@ app.use('/questions', questionRoutes);
 app.use('/answers', answerRoutes);
 app.use('/results', resultsRoutes);
 app.use('/student-answer', studentAnswerRoutes);
+app.use('/exam-time', examTimeRoutes);
 
 sequelize.sync()
   .then(() => {
