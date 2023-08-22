@@ -58,8 +58,9 @@ function TeacherInterface() {
         }
     };
 
-    const viewExam = (pExamID) => {
+    const viewExam = (pExamID, pExamName) => {
         localStorage.setItem("ExamID", pExamID);
+        localStorage.setItem("examName", pExamName);
         navigate('/addExam');
     };
 
@@ -87,7 +88,7 @@ function TeacherInterface() {
                         {(searchClicked ? filteredExams : exams).map((exam) => (
                            
                            <tr key={exam.id} className="border-2">
-                                <button onClick={() => {viewExam(exam.examID)}}><td className="py-2 px-4">{exam.examName}</td> </button>
+                                <button onClick={() => {viewExam(exam.examID, exam.examName)}}><td className="py-2 px-4">{exam.examName}</td> </button>
                                 <td className="py-2 px-4">{new Date().toLocaleString()}</td>
                                 <td className="py-2 px-4">{exam.examStatus}</td>
                             </tr>

@@ -100,7 +100,7 @@ function DisplayResults() {
                         </div>
                     </div>
                 </div>
-                </div> */}
+            </div> */}
             <div className="flex-grow flex items-left justify-center">
                 <div className="w-2/5">
                     <button onClick={() => { addResults() }} className="bg-[#9CA3AF] text-black px-4 py-2 rounded mt-8 self-end w-[150px]">Close</button>
