@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function AddExam() {
     const navigate = useNavigate();
 
+    const [userID, setUserID] = useState(localStorage.getItem("userID"));
     const [examID, setExamID] = useState(localStorage.getItem("ExamID"));
     const [examName, setExamName] = useState('');
     const [startDateAndTime, setStartDateAndTime] = useState('');
@@ -118,7 +119,8 @@ function AddExam() {
                 examName: examName,
                 startDateAndTime: startDateAndTime,
                 duration: duration,
-                examStatus: 'Published'
+                examStatus: 'Published',
+                userID: userID
             };
 
             const response = await axios.post('http://localhost:3000/exams', examData);
@@ -141,7 +143,8 @@ function AddExam() {
                 examName: examName,
                 startDateAndTime: startDateAndTime,
                 duration: duration,
-                examStatus: 'Draft'
+                examStatus: 'Draft', 
+                userID: userID
             };
 
             const response = await axios.post('http://localhost:3000/exams', examData);

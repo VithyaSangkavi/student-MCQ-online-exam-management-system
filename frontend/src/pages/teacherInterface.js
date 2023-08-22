@@ -39,12 +39,14 @@ function TeacherInterface() {
     };
     
     const createExam = async () => {
+        const userID = localStorage.getItem('userID')
         try {
             const examData = {
                 examName: null,
                 startDateAndTime: null,
                 duration: null,
-                examStatus: 'Draft'
+                examStatus: 'Draft',
+                userID: userID
             };
 
             const response = await axios.post('http://localhost:3000/exams', examData);
@@ -95,7 +97,6 @@ function TeacherInterface() {
                             
                         ))}
                     </tbody>
-
                 </table>
             </div>
         </>

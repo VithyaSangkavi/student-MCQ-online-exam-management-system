@@ -11,20 +11,19 @@ function LoginForm() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/users/login', {
+      const response = await axios.post('http://localhost:3000/users/login', {  
         userEmail: email,
         password: password,
       });
-
-      const userID = response.data.userID;
-
-      localStorage.setItem('userID', userID);
-
+      
       if (response.status === 200) {
+        const thisUserID = data.user.userID;
         const data = response.data;
         localStorage.setItem('token', data.token);
+        localStorage.setItem('userID', data.user.userID);
         console.log('Login successful:', data.userType);
-        console.log('Login successful:', data);
+        console.log('Login successful:', thisUserID);
+
 
         if (data.userType === 'Student') {
           navigate('/studentInterface');

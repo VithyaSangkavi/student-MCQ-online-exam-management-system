@@ -60,7 +60,7 @@ function DisplayResults() {
                 marks: formatedMarks,
                 examStatusStudent: 'Completed',
                 examID: examID,
-                userID: 1
+                userID: userID
             };
 
             const response = await axios.post('http://localhost:3000/results', resultsData);
