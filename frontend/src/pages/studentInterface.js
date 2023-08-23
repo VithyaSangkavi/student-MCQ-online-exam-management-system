@@ -41,10 +41,52 @@ function StudentInterface() {
         setSearchClicked(true);
     };
 
-    const viewExam = (pExamID) => {
+    const viewExam = async (pExamID) => {
         localStorage.setItem("StuExamID", pExamID);
-        navigate('/examPaper');
+    
+        try {
+            const response = await axios.get('http://localhost:3000/exam-time');
+            console.log('Fetched exam time:', response.data);
+    
+            const userID = localStorage.getItem('userID');
+            const examID = localStorage.getItem('StuExamID');
+    
+            console.log('User ID:', userID);
+            console.log('Exam ID:', examID);
+    
+            if (response.data.userID === userID && response.data.examID === examID) {
+                navigate('/examPaper');
+            } else {
+                const currentDateTime = new Date();
+    
+                try {
+                    const examResponse = await axios.get(`http://localhost:3000/exams/${examID}`);
+                    const examDurationInMinutes = examResponse.data.duration;
+
+                    const examEndTime = new Date(currentDateTime.getTime() + (examDurationInMinutes * 60000)); // 60000 milliseconds in a minute
+    
+                    const examTimeData = {
+                        examStartTime: currentDateTime,
+                        examEndTime: examEndTime,
+                        userID: userID,
+                        examID: examID
+                    };
+    
+                    const examTimeResponse = await axios.post('http://localhost:3000/exam-time', examTimeData);
+                    console.log('Exam time added:', examTimeResponse.data);
+    
+                    localStorage.setItem('endTime', examEndTime);
+                    
+                    navigate('/examPaper');
+                } catch (error) {
+                    console.error('Error adding exam time:', error);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching exam time:', error);
+        }
     };
+    
 
     return (
         <>

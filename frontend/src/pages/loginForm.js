@@ -17,8 +17,8 @@ function LoginForm() {
       });
       
       if (response.status === 200) {
-        const thisUserID = data.user.userID;
         const data = response.data;
+        const thisUserID = data.user.userID;
         localStorage.setItem('token', data.token);
         localStorage.setItem('userID', data.user.userID);
         console.log('Login successful:', data.userType);

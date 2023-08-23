@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function DisplayResults() {
 
@@ -13,8 +13,13 @@ function DisplayResults() {
     const [calculatedGrade, setCalculatedGrade] = useState('')
     const [results, setResults] = useState('')
 
+    const [questionResults, setQuestionResults] = useState({});
+    
     useEffect(() => {
-        const array = answerArray.split(',');
+        const unfilteredArray = answerArray.split(',');
+        console.log('unfilter '+unfilteredArray)
+        const array = unfilteredArray.filter(item => item !== null);
+        console.log('New array '+array)
 
         let count = 0;
 
@@ -50,7 +55,17 @@ function DisplayResults() {
         }
 
         setResults(results);
-    })
+        let questionResultsMap = {};
+        let questionIndex = 1;
+        array.forEach((answer) => {
+            if(answer === '1' || answer === '0') {
+                questionResultsMap[questionIndex] = answer === '1' ? 'Correct' : answer === '0' ? 'Wrong' : '';
+                questionIndex++;
+            }
+        });
+        setQuestionResults(questionResultsMap); // Set questionResults here
+
+    }, [answerArray, noOfQuestions]);
 
     const addResults = async () => {
         const userID = localStorage.getItem('userID');
@@ -65,7 +80,7 @@ function DisplayResults() {
 
             const response = await axios.post('http://localhost:3000/results', resultsData);
             console.log('Results added:', response.data);
-            
+
             navigate('/studentInterface');
 
         } catch (error) {
@@ -86,21 +101,21 @@ function DisplayResults() {
                 </div>
             </div>
 
-            {/* <div className="mt-8 flex-grow flex items-center justify-center">
+            <div className="mt-8 flex-grow flex items-center justify-center">
                 <div className="w-2/5 p-8 border-2">
                     <p className="text-lg font-semibold">Questions</p>
                     <div className="mt-4 space-y-2">
-                        <div className="flex items-center">
-                            <p className="font-semibold">Question 1</p>
-                            <p className="text-[#31C48D] ml-[400px] font-semibold">Correct</p>
-                        </div>
-                        <div className="flex items-center">
-                            <p className="font-semibold">Question 2</p>
-                            <p className="text-red-600 ml-[400px] font-semibold">Wrong</p>
-                        </div>
+                        {Object.keys(questionResults).map((questionID) => (
+                            <div key={questionID} className="flex items-center">
+                                <p className="font-semibold">{`Question ${questionID}`}</p>
+                                <p className={`ml-[400px] font-semibold ${questionResults[questionID] === 'Correct' ? 'text-[#31C48D]' : 'text-red-600'}`}>
+                                    {questionResults[questionID]}
+                                </p>
+                            </div>
+                        ))}
                     </div>
                 </div>
-            </div> */}
+            </div>
             <div className="flex-grow flex items-left justify-center">
                 <div className="w-2/5">
                     <button onClick={() => { addResults() }} className="bg-[#9CA3AF] text-black px-4 py-2 rounded mt-8 self-end w-[150px]">Close</button>

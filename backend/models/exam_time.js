@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/database');
 const user = require('./user');
+const exam = require('./exam')
 
 const ExamTime = sequelize.define('exam_time', {
   timeID: {
@@ -20,6 +21,13 @@ const ExamTime = sequelize.define('exam_time', {
     references: {
       model: user,
       key: 'userID',
+    },
+  },
+  examID: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: exam,
+      key: 'examID',
     },
   },
 }, {
