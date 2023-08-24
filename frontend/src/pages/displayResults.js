@@ -6,6 +6,13 @@ function DisplayResults() {
 
     const navigate = useNavigate('');
 
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization' : `Bearer ${token}`
+        }
+    }
+
     const [answerArray, setAnswerArray] = useState(localStorage.getItem("AnswerArray"));
     const [noOfQuestions, setNoOfQuestions] = useState(localStorage.getItem("NoOfQuestions"));
     const [formatedMarks, setFormatedMarks] = useState(0);
@@ -78,7 +85,7 @@ function DisplayResults() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/results', resultsData);
+            const response = await axios.post('http://localhost:3000/results', resultsData, config);
             console.log('Results added:', response.data);
 
             navigate('/studentInterface');

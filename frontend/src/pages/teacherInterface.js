@@ -8,6 +8,13 @@ import { useNavigate } from 'react-router-dom';
 function TeacherInterface() {
     const navigate = useNavigate();
 
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization' : `Bearer ${token}`
+        }
+    }
+
     const [exams, setExams] = useState([]);
     const [filteredExams, setFilteredExams] = useState([]);
     const [searchClicked, setSearchClicked] = useState(false);
@@ -22,7 +29,7 @@ function TeacherInterface() {
 
     const teacherExams = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/exams');
+            const response = await axios.get('http://localhost:3000/exams', config);
             console.log('Fetched exams:', response.data);
             setExams(response.data);
         } catch (error) {
@@ -49,7 +56,7 @@ function TeacherInterface() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/exams', examData);
+            const response = await axios.post('http://localhost:3000/exams', examData, config);
             console.log('Exam added:', response.data);
             localStorage.setItem("ExamID", response.data.examID)
 

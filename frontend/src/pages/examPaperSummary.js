@@ -2,20 +2,27 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function ExamPaperSummary() {
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization' : `Bearer ${token}`
+        }
+    }
+    
     const [studentsCount, setStudentsCount] = useState(0);
     const [completedStudentsCount, setCompletedStudentsCount] = useState(0);
     const [attendingStudents, setAttendingStudents] = useState([]);
     const [completedStudents, setCompletedStudents] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:3000/users')
+        axios.get('http://localhost:3000/users', config)
             .then(response => {
                 const users = response.data;
                 const studentUsers = users.filter(user => user.userType === 'Student');
                 setStudentsCount(studentUsers.length);
                 setAttendingStudents(studentUsers);
 
-                axios.get('http://localhost:3000/results')
+                axios.get('http://localhost:3000/results', config)
                     .then(resultsResponse => {
                         const completedStudentsIDs = resultsResponse.data
                             .filter(result => result.examStatusStudent === 'Completed')

@@ -4,11 +4,20 @@ import { useNavigate } from 'react-router-dom';
 
 function ExamPaper() {
 
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }
+
     const [examID, setExamID] = useState(localStorage.getItem("StuExamID"));
     const [questionNo, setQuestionNo] = useState(1);
     const [selectedAnswer, setSelectedAnswer] = useState({ questionID: null, answerID: null });
     const [trackAnswers, setTrackAnswers] = useState([]);
     const [questionID, setQuestionID] = useState('');
+
+    const [examEnded, setExamEnded] = useState(false);
 
     const navigate = useNavigate();
 
@@ -22,7 +31,7 @@ function ExamPaper() {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/questions');
+            const response = await axios.get('http://localhost:3000/questions', config);
 
             // Filter questions based on examID
             const filteredQuestions = response.data.filter((question) => question.examID == examID);
@@ -40,7 +49,7 @@ function ExamPaper() {
 
     const fetchAnswers = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/answers');
+            const response = await axios.get('http://localhost:3000/answers', config);
             const filteredAnswers = response.data.filter((answer) => answer.questionID == questionID);
 
             setAnswers(response.data);
@@ -59,12 +68,12 @@ function ExamPaper() {
             const response = await axios.post('http://localhost:3000/student-answer', {
                 questionID: selectedAnswer.questionID,
                 answerID: selectedAnswer.answerID,
-            });
+            }, config);
 
-            const correctAnswerResponse = await axios.get('http://localhost:3000/answers');
+            const correctAnswerResponse = await axios.get('http://localhost:3000/answers', config);
             console.log(correctAnswerResponse);
 
-            const questionResponse = await axios.get(`http://localhost:3000/questions/exam/${examID}`).then((res) => {
+            const questionResponse = await axios.get(`http://localhost:3000/questions/exam/${examID}`, config).then((res) => {
                 return res.data
             })
 
@@ -107,6 +116,14 @@ function ExamPaper() {
 
         setSelectedAnswer({ questionID: null, answerID: null });
         setQuestionNo(questionNo + 1);
+
+        if (questionNo >= questions.length) {
+            setExamEnded(true);
+        } else {
+            // Proceed to the next question
+            setSelectedAnswer({ questionID: null, answerID: null });
+            setQuestionNo(questionNo + 1);
+        }
     };
 
 
@@ -212,6 +229,13 @@ function ExamPaper() {
                             </>
                         ) : (<></>)
                         ))}
+
+                        {examEnded && (
+                            <div className="text-center">
+                                <p className="mt-6 text-xl font-semibold">End of Exam</p>
+                                <p>You have completed the exam.</p>
+                            </div>
+                        )}
 
                         <div className="flex justify-center mt-6 space-x-4">
                             <button className="bg-[#9CA3AF] text-black px-4 py-2 rounded w-[220px] h-[40px] mr[100px]" onClick={() => { prevQuestion() }}>Prev</button>

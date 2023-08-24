@@ -4,6 +4,13 @@ import SearchBar from '../components/searchBar';
 import { useNavigate } from 'react-router-dom';
 
 function StudentInterface() {
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization' : `Bearer ${token}`
+        }
+    }
+
     const [exams, setExams] = useState([]);
     const [filteredExams, setFilteredExams] = useState([]);
     const [searchClicked, setSearchClicked] = useState(false);
@@ -18,7 +25,7 @@ function StudentInterface() {
         try {
             const token = localStorage.getItem('token');
 
-            const response = await axios.get('http://localhost:3000/exams', {
+            const response = await axios.get('http://localhost:3000/exams', config, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -45,7 +52,7 @@ function StudentInterface() {
         localStorage.setItem("StuExamID", pExamID);
     
         try {
-            const response = await axios.get('http://localhost:3000/exam-time');
+            const response = await axios.get('http://localhost:3000/exam-time', config);
             console.log('Fetched exam time:', response.data);
     
             const userID = localStorage.getItem('userID');
@@ -60,7 +67,7 @@ function StudentInterface() {
                 const currentDateTime = new Date();
     
                 try {
-                    const examResponse = await axios.get(`http://localhost:3000/exams/${examID}`);
+                    const examResponse = await axios.get(`http://localhost:3000/exams/${examID}`, config);
                     const examDurationInMinutes = examResponse.data.duration;
 
                     const examEndTime = new Date(currentDateTime.getTime() + (examDurationInMinutes * 60000)); // 60000 milliseconds in a minute
@@ -72,7 +79,7 @@ function StudentInterface() {
                         examID: examID
                     };
     
-                    const examTimeResponse = await axios.post('http://localhost:3000/exam-time', examTimeData);
+                    const examTimeResponse = await axios.post('http://localhost:3000/exam-time', examTimeData, config);
                     console.log('Exam time added:', examTimeResponse.data);
     
                     localStorage.setItem('endTime', examEndTime);

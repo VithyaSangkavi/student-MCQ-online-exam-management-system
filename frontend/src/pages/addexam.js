@@ -5,6 +5,13 @@ import { useNavigate } from 'react-router-dom';
 function AddExam() {
     const navigate = useNavigate();
 
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization' : `Bearer ${token}`
+        }
+    }
+
     const [userID, setUserID] = useState(localStorage.getItem("userID"));
     const [examID, setExamID] = useState(localStorage.getItem("ExamID"));
     const [examName, setExamName] = useState('');
@@ -29,7 +36,7 @@ function AddExam() {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/questions');
+            const response = await axios.get('http://localhost:3000/questions', config);
             // console.log('Fetched questions:', response.data);
             setQuestions(response.data);
         } catch (error) {
@@ -43,7 +50,7 @@ function AddExam() {
 
     const fetchAnswers = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/answers');
+            const response = await axios.get('http://localhost:3000/answers', config);
             // console.log('Fetched answers:', response.data);
             setAnswers(response.data);
         } catch (error) {
@@ -83,7 +90,7 @@ function AddExam() {
                 questionNo: questionNo
             };
 
-            const response = await axios.post('http://localhost:3000/questions', questionData);
+            const response = await axios.post('http://localhost:3000/questions', questionData, config);
             console.log('Question added:', response.data);
 
             const questionID = response.data.questionID;
@@ -94,7 +101,7 @@ function AddExam() {
                     questionID: questionID,
                     correctAnswer: index === correctAnswer
                 };
-                return axios.post('http://localhost:3000/answers', answerData);
+                return axios.post('http://localhost:3000/answers', answerData, config);
             });
 
             const responses = await Promise.all(answerPromises);
@@ -123,7 +130,7 @@ function AddExam() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/exams', examData);
+            const response = await axios.post('http://localhost:3000/exams', examData, config);
             console.log('Exam added:', response.data);
         } catch (error) {
             console.error('Error adding exam:', error);
@@ -147,7 +154,7 @@ function AddExam() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/exams', examData);
+            const response = await axios.post('http://localhost:3000/exams', examData, config);
             console.log('Exam added:', response.data);
         } catch (error) {
             console.error('Error adding exam:', error);

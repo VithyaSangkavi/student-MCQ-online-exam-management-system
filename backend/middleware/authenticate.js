@@ -10,7 +10,8 @@ const authenticate = async (req, res, next) => {
   }
 
   try {
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const tokenWithoutBearer = token.replace('Bearer ', ''); // Remove "Bearer " prefix
+    const decoded = await jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET_KEY);
     const user = await User.findByPk(decoded.id); 
 
     if (!user) {
