@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function ExamPaperSummary() {
     const token = localStorage.getItem('token');
@@ -8,11 +9,15 @@ function ExamPaperSummary() {
             'Authorization' : `Bearer ${token}`
         }
     }
-    
+    const navigate = useNavigate();
+
     const [studentsCount, setStudentsCount] = useState(0);
     const [completedStudentsCount, setCompletedStudentsCount] = useState(0);
     const [attendingStudents, setAttendingStudents] = useState([]);
     const [completedStudents, setCompletedStudents] = useState([]);
+
+    const examID = localStorage.getItem("ExamID");
+    const userID = localStorage.getItem("Stu")
 
     useEffect(() => {
         axios.get('http://localhost:3000/users', config)
@@ -41,6 +46,18 @@ function ExamPaperSummary() {
                 console.error('Error fetching users:', error);
             });
     }, []);
+
+    const deleteExam = async () => {
+        try {
+            // Delete the exam using its examID
+            await axios.delete(`http://localhost:3000/exams/${examID}`, config);
+            console.log('Exam deleted successfully');
+            navigate('/teacherInterface')
+           
+        } catch (error) {
+            console.error('Error deleting exam:', error);
+        }
+    };
 
     return (
         <>
@@ -73,7 +90,7 @@ function ExamPaperSummary() {
                 </div>
             </div >
             <div className="flex justify-end mt-8">
-                <button className="bg-[#C81E1E] text-white font-bold px-4 py-2 rounded mt-4 mr-[20px] w-[150px]">
+                <button type = "submit" onClick={deleteExam} className="bg-[#C81E1E] text-white font-bold px-4 py-2 rounded mt-4 mr-[20px] w-[150px]">
                     End Exam
                 </button>
             </div>

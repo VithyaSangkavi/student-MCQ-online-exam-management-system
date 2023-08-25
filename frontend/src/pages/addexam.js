@@ -163,6 +163,12 @@ function AddExam() {
         navigate('/teacherInterface');
     }
 
+    const viewSummary = async() => {
+        localStorage.setItem('viewSummaryExamID', examID);
+        localStorage.setItem('viewSummaryUserID', userID);
+        navigate('/examPaperSummary');
+    }
+
     return (
         <>
             <div className="flex">
@@ -246,6 +252,8 @@ function AddExam() {
                         <br /> <br /> <br />
                         <button type="submit" onClick={handleAddQuestion} className="bg-[#31C48D] text-white font-bold px-4 py-2 rounded float-right">Save</button>
                     </form>
+                    <br/>
+                    <button type = "submit" onClick={viewSummary} className='bg-[blue] text-white  font-bold px-4 py-2 rounded float-right'>View Summary</button>
                 </div>
             </div >
         </>
