@@ -16,10 +16,30 @@ function ExamPaperSummary() {
     const [attendingStudents, setAttendingStudents] = useState([]);
     const [completedStudents, setCompletedStudents] = useState([]);
 
+    const [startDateAndTime, setStartDateAndTime] = useState(null);
+    const [duration, setDuration] = useState(null);
+    const [examEndTime, setExamEndTime] = useState(null);
+
     const examID = localStorage.getItem("ExamID");
     const userID = localStorage.getItem("Stu")
 
     useEffect(() => {
+        axios.get(`http://localhost:3000/exams/${examID}`, config)
+        .then(examResponse => {
+            const examDetails = examResponse.data;
+            setStartDateAndTime(examDetails.startDateAndTime);
+            setDuration(examDetails.duration);
+
+            // Calculate examEndTime
+            const durationInMilliseconds = duration * 60 * 1000; // Convert duration to milliseconds
+            const startTime = new Date(startDateAndTime).getTime(); // Convert start time to milliseconds
+            const examEndTimeInMilliseconds = startTime + durationInMilliseconds;
+            setExamEndTime(examEndTimeInMilliseconds);
+        })
+        .catch(error => {
+            console.error('Error fetching exam details:', error);
+        });
+
         axios.get('http://localhost:3000/users', config)
             .then(response => {
                 const users = response.data;
@@ -30,12 +50,15 @@ function ExamPaperSummary() {
                 axios.get('http://localhost:3000/results', config)
                     .then(resultsResponse => {
                         const completedStudentsIDs = resultsResponse.data
-                            .filter(result => result.examStatusStudent === 'Completed')
+                            .filter(result => result.examStatusStudent === 'Completed' && result.examID == examID)
                             .map(result => result.userID);
 
                         // Filter the student users to get completed students
                         const completedStudentsData = studentUsers.filter(student => completedStudentsIDs.includes(student.userID));
                         setCompletedStudents(completedStudentsData);
+
+                        console.log(completedStudentsData.length)
+
                         setCompletedStudentsCount(completedStudentsData.length);
                     })
                     .catch(error => {
@@ -59,6 +82,20 @@ function ExamPaperSummary() {
         }
     };
 
+    const formatTime = (timeInMilliseconds) => {
+        const date = new Date(timeInMilliseconds);
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12;
+        hours = hours || 12; // Handle midnight
+
+        minutes = minutes.toString().padStart(2, '0');
+        return `${hours}:${minutes} ${ampm}`;
+    };
+
+
     return (
         <>
             <div className="p-4 flex justify-start">
@@ -72,8 +109,8 @@ function ExamPaperSummary() {
                         <p className="text-center mt-4">Time left: 00:30 mins</p>
                     </div>
                     <div className="border-2 p-[20px] h-[200px] mt-6">
-                        <p className="font-semibold">Exam started time:</p>
-                        <p className="font-semibold mt-2">Exam ending time:</p>
+                        <p className="font-semibold">Exam started time: {startDateAndTime !== null ? formatTime(startDateAndTime) : ''}</p>
+                        <p className="font-semibold mt-2">Exam ending time: {examEndTime !== null ? formatTime(examEndTime) : ''}</p>
                     </div>
                 </div>
 
