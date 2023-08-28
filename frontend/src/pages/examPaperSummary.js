@@ -99,14 +99,13 @@ function ExamPaperSummary() {
     return (
         <>
             <div className="p-4 flex justify-start">
-                <button className="bg-gray-300 px-4 py-2 rounded">Back</button>
+                <button className="bg-gray-300 px-4 py-2 rounded" onClick={() => navigate('/addExam')} >Back</button>
             </div>
             <div className="flex mt-8 ml-4">
                 <div className="w-3/5 mr-4">
                     <div className="border-2 p-[20px]">
-                        <p className="font-semibold">Exam completed</p>
-                        <p className="text-center text-7xl">{completedStudentsCount}/{studentsCount}</p>
-                        <p className="text-center mt-4">Time left: 00:30 mins</p>
+                        <p className="font-semibold">Exam completed</p> <br/>
+                        <p className="text-center text-7xl">{completedStudentsCount}/{studentsCount}</p> <br/>
                     </div>
                     <div className="border-2 p-[20px] h-[200px] mt-6">
                         <p className="font-semibold">Exam started time: {startDateAndTime !== null ? formatTime(startDateAndTime) : ''}</p>

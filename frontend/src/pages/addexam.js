@@ -175,6 +175,7 @@ function AddExam() {
 
                 <div className="w-2/3 bg-white p-4">
                     {/* <button className="bg-gray-300 px-4 py-2 rounded-md">Exam Name</button> <br /> <br /> */}
+                    <button className="bg-gray-300 px-2 py-0 rounded" onClick={() => navigate('/teacherInterface')} >Back</button> <br></br>
                     <input type='text' className='border-0' placeholder={thisExamName} value={thisExamName} onChange={(e) => setExamName(e.target.value)} />
                     <div className="flex justify-between items-center">
                         <h2 className="mt-4">Question List</h2>

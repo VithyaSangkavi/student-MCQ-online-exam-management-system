@@ -199,7 +199,7 @@ function ExamPaper() {
     return (
         <>
             <div className="p-4 flex justify-start">
-                <button className="bg-gray-300 px-4 py-2 rounded">Back</button>
+                <button className="bg-gray-300 px-4 py-2 rounded" onClick={() => navigate('/studentInterface')} >Back</button>
             </div>
             {trackAnswers}
             <div className="flex-grow flex flex-col items-center justify-center">
