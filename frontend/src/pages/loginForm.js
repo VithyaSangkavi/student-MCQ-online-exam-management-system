@@ -9,22 +9,26 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const response = await axios.post('http://localhost:3000/users/login', {  
+      const response = await axios.post('http://localhost:3000/users/login', {
         userEmail: email,
         password: password,
       });
-      
+  
       if (response.status === 200) {
         const data = response.data;
         const thisUserID = data.user.userID;
+        const thisUserName = data.user.userName;
+  
         localStorage.setItem('token', data.token);
         localStorage.setItem('userID', data.user.userID);
+        localStorage.setItem('userName', data.user.userName);
+  
         console.log('Login successful:', data.userType);
         console.log('Login successful:', thisUserID);
-
-
+        console.log('User Name: ', thisUserName);
+  
         if (data.userType === 'Student') {
           navigate('/studentInterface');
         } else if (data.userType === 'Teacher') {
@@ -42,7 +46,7 @@ function LoginForm() {
       alert('An error occurred while logging in');
     }
   };
-
+  
   return (
     <>
       <div className='min-h-screen flex justify-center items-center'>

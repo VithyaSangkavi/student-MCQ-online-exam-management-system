@@ -8,7 +8,7 @@ function AddExam() {
     const token = localStorage.getItem('token');
     const config = {
         headers: {
-            'Authorization' : `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
         }
     }
 
@@ -123,6 +123,7 @@ function AddExam() {
     const handleAddExam = async () => {
         try {
             const examData = {
+           
                 examName: examName,
                 startDateAndTime: startDateAndTime,
                 duration: duration,
@@ -130,7 +131,7 @@ function AddExam() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/exams', examData, config);
+            const response = await axios.put(`http://localhost:3000/exams/${examID}`, examData, config);
             console.log('Exam added:', response.data);
         } catch (error) {
             console.error('Error adding exam:', error);
@@ -150,7 +151,7 @@ function AddExam() {
                 examName: examName,
                 startDateAndTime: startDateAndTime,
                 duration: duration,
-                examStatus: 'Draft', 
+                examStatus: 'Draft',
                 userID: userID
             };
 
@@ -163,7 +164,7 @@ function AddExam() {
         navigate('/teacherInterface');
     }
 
-    const viewSummary = async() => {
+    const viewSummary = async () => {
         localStorage.setItem('viewSummaryExamID', examID);
         localStorage.setItem('viewSummaryUserID', userID);
         navigate('/examPaperSummary');
@@ -176,7 +177,7 @@ function AddExam() {
                 <div className="w-2/3 bg-white p-4">
                     {/* <button className="bg-gray-300 px-4 py-2 rounded-md">Exam Name</button> <br /> <br /> */}
                     <button className="bg-gray-300 px-2 py-0 rounded" onClick={() => navigate('/teacherInterface')} >Back</button> <br></br>
-                    <input type='text' className='border-0' placeholder={thisExamName} value={thisExamName} onChange={(e) => setExamName(e.target.value)} />
+                    <input type='text' className='border-0' placeholder={thisExamName} value={examName} onChange={(e) => setExamName(e.target.value)} />
                     <div className="flex justify-between items-center">
                         <h2 className="mt-4">Question List</h2>
                         <button className="bg-[#C81E1E] text-white font-bold px-4 py-2 rounded w-[270px]">Add Question</button>
@@ -233,28 +234,34 @@ function AddExam() {
                         <br />
 
                         <div className="mb-3">
-                            <label for="answer1" className="block mb-1">Answer List</label> <br />
+                            <label htmlFor="answer1" className="block mb-1">Answer List</label>
                             {answerValue.map((value, index) => (
-                                <div key={index}>
+                                <div key={index} className="flex items-center mb-3">
                                     <input
                                         type="text"
                                         id={`answer${index + 1}`}
-                                        className={`w-full border border-gray-300 px-3 py-2 rounded mb-[20px] ${correctAnswer === index ? 'bg-green-100' : ''
-                                            }`}
+                                        className={`w-full border border-gray-300 px-3 py-2 rounded ${correctAnswer === index ? 'bg-green-100' : ''}`}
                                         placeholder={`Answer ${index + 1}`}
                                         value={value}
-                                        onClick={() => handleCorrectAnswerChange(index)}
                                         onChange={(e) => handleAnswerChange(index, e.target.value)}
                                     />
+                                    <input
+                                        type="radio"
+                                        name="correctAnswer"
+                                        checked={correctAnswer === index}
+                                        onChange={() => handleCorrectAnswerChange(index)}
+                                    />
+                                   
                                 </div>
                             ))}
                         </div>
 
+
                         <br /> <br /> <br />
                         <button type="submit" onClick={handleAddQuestion} className="bg-[#31C48D] text-white font-bold px-4 py-2 rounded float-right">Save</button>
                     </form>
-                    <br/>
-                    <button type = "submit" onClick={viewSummary} className='bg-[blue] text-white  font-bold px-4 py-2 rounded float-right'>View Summary</button>
+                    <br />
+                    <button type="submit" onClick={viewSummary} className='bg-[blue] text-white  font-bold px-4 py-2 rounded float-right'>View Summary</button>
                 </div>
             </div >
         </>

@@ -6,7 +6,7 @@ function ExamPaperSummary() {
     const token = localStorage.getItem('token');
     const config = {
         headers: {
-            'Authorization' : `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
         }
     }
     const navigate = useNavigate();
@@ -25,20 +25,20 @@ function ExamPaperSummary() {
 
     useEffect(() => {
         axios.get(`http://localhost:3000/exams/${examID}`, config)
-        .then(examResponse => {
-            const examDetails = examResponse.data;
-            setStartDateAndTime(examDetails.startDateAndTime);
-            setDuration(examDetails.duration);
+            .then(examResponse => {
+                const examDetails = examResponse.data;
+                setStartDateAndTime(examDetails.startDateAndTime);
+                setDuration(examDetails.duration);
 
-            // Calculate examEndTime
-            const durationInMilliseconds = duration * 60 * 1000; // Convert duration to milliseconds
-            const startTime = new Date(startDateAndTime).getTime(); // Convert start time to milliseconds
-            const examEndTimeInMilliseconds = startTime + durationInMilliseconds;
-            setExamEndTime(examEndTimeInMilliseconds);
-        })
-        .catch(error => {
-            console.error('Error fetching exam details:', error);
-        });
+                // Calculate examEndTime
+                const durationInMilliseconds = duration * 60 * 1000; // Convert duration to milliseconds
+                const startTime = new Date(startDateAndTime).getTime(); // Convert start time to milliseconds
+                const examEndTimeInMilliseconds = startTime + durationInMilliseconds;
+                setExamEndTime(examEndTimeInMilliseconds);
+            })
+            .catch(error => {
+                console.error('Error fetching exam details:', error);
+            });
 
         axios.get('http://localhost:3000/users', config)
             .then(response => {
@@ -70,13 +70,15 @@ function ExamPaperSummary() {
             });
     }, []);
 
+    
     const deleteExam = async () => {
+        console.log(examID)
         try {
-            // Delete the exam using its examID
-            await axios.delete(`http://localhost:3000/exams/${examID}`, config);
+            const response = await axios.delete(`http://localhost:3000/exams/${examID}`, config);
+
             console.log('Exam deleted successfully');
             navigate('/teacherInterface')
-           
+
         } catch (error) {
             console.error('Error deleting exam:', error);
         }
@@ -104,8 +106,8 @@ function ExamPaperSummary() {
             <div className="flex mt-8 ml-4">
                 <div className="w-3/5 mr-4">
                     <div className="border-2 p-[20px]">
-                        <p className="font-semibold">Exam completed</p> <br/>
-                        <p className="text-center text-7xl">{completedStudentsCount}/{studentsCount}</p> <br/>
+                        <p className="font-semibold">Exam completed</p> <br />
+                        <p className="text-center text-7xl">{completedStudentsCount}/{studentsCount}</p> <br />
                     </div>
                     <div className="border-2 p-[20px] h-[200px] mt-6">
                         <p className="font-semibold">Exam started time: {startDateAndTime !== null ? formatTime(startDateAndTime) : ''}</p>
@@ -126,7 +128,7 @@ function ExamPaperSummary() {
                 </div>
             </div >
             <div className="flex justify-end mt-8">
-                <button type = "submit" onClick={deleteExam} className="bg-[#C81E1E] text-white font-bold px-4 py-2 rounded mt-4 mr-[20px] w-[150px]">
+                <button type="submit" onClick={deleteExam} className="bg-[#C81E1E] text-white font-bold px-4 py-2 rounded mt-4 mr-[20px] w-[150px]">
                     End Exam
                 </button>
             </div>

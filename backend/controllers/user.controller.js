@@ -97,11 +97,34 @@ const loginUser = async (req, res) => {
   }
 };
 
+const invalidatedTokens = new Set();
+
+const logoutUser = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    // Add the token to the invalidated tokens list
+    invalidatedTokens.add(token);
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Error logging out backend:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const isTokenValid = (token) => {
+  // Check if the token is in the invalidatedTokens set
+  return !invalidatedTokens.has(token);
+};
+
 module.exports = {
   createUser,
   getAllUsers,
   getUserById,
   updateUserById,
   deleteUserById,
-  loginUser
+  loginUser,
+  logoutUser,
+  isTokenValid
 };

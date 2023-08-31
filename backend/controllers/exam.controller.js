@@ -47,7 +47,6 @@ const updateExamById = async (req, res) => {
         startDateAndTime,
         duration,
         examStatus,
-        totalMarks,
         userID,
       });
       res.status(200).json(exam);
