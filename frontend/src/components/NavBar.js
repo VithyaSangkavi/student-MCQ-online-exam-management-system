@@ -7,12 +7,24 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchUserFromLocalStorage = () => {
     const storedUserName = localStorage.getItem('userName');
+    console.log('Stored Username:', storedUserName);
     if (storedUserName) {
       setUser({ userName: storedUserName });
     }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const storedUserName = localStorage.getItem('userName');
+    console.log(storedUserName)
+    if (storedUserName) {
+      setUser({ userName: storedUserName });
+    }
+
   }, []);
 
   const handleLogout = async () => {
@@ -22,9 +34,11 @@ const Navbar = () => {
       });
 
       if (response.status === 200) {
-        localStorage.removeItem('userName'); 
-        setUser(null); 
-        navigate('/'); 
+        localStorage.removeItem('userName');
+        setUser(null);
+        navigate('/');
+
+    
       } else {
         console.error('Logout failed:', response.data.error);
       }
@@ -32,6 +46,7 @@ const Navbar = () => {
       console.error('Error logging out:', error.message);
     }
   };
+
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">

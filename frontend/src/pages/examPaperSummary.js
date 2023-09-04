@@ -3,12 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function ExamPaperSummary() {
+    const apiUrl = process.env.REACT_APP_API_BASE_URL;
     const token = localStorage.getItem('token');
     const config = {
         headers: {
             'Authorization': `Bearer ${token}`
         }
     }
+
     const navigate = useNavigate();
 
     const [studentsCount, setStudentsCount] = useState(0);
@@ -24,7 +26,7 @@ function ExamPaperSummary() {
     const userID = localStorage.getItem("Stu")
 
     useEffect(() => {
-        axios.get(`http://localhost:3000/exams/${examID}`, config)
+        axios.get(`${apiUrl}/exams/${examID}`, config)
             .then(examResponse => {
                 const examDetails = examResponse.data;
                 setStartDateAndTime(examDetails.startDateAndTime);
@@ -40,14 +42,14 @@ function ExamPaperSummary() {
                 console.error('Error fetching exam details:', error);
             });
 
-        axios.get('http://localhost:3000/users', config)
+        axios.get(`${apiUrl}/users`, config)
             .then(response => {
                 const users = response.data;
                 const studentUsers = users.filter(user => user.userType === 'Student');
                 setStudentsCount(studentUsers.length);
                 setAttendingStudents(studentUsers);
 
-                axios.get('http://localhost:3000/results', config)
+                axios.get(`${apiUrl}/results`, config)
                     .then(resultsResponse => {
                         const completedStudentsIDs = resultsResponse.data
                             .filter(result => result.examStatusStudent === 'Completed' && result.examID == examID)
@@ -74,7 +76,7 @@ function ExamPaperSummary() {
     const deleteExam = async () => {
         console.log(examID)
         try {
-            const response = await axios.delete(`http://localhost:3000/exams/${examID}`, config);
+            const response = await axios.delete(`${apiUrl}/exams/${examID}`, config);
 
             console.log('Exam deleted successfully');
             navigate('/teacherInterface')

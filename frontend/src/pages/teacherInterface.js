@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function TeacherInterface() {
     const navigate = useNavigate();
+    const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
     const token = localStorage.getItem('token');
     const config = {
@@ -18,18 +19,20 @@ function TeacherInterface() {
     const [exams, setExams] = useState([]);
     const [filteredExams, setFilteredExams] = useState([]);
     const [searchClicked, setSearchClicked] = useState(false);
-    
+    const [searchQuery, setSearchQuery] = useState('');
+
     const [examName, setExamName] = useState('');
     const [startDateAndTime, setStartDateAndTime] = useState('');
     const [duration, setDuration] = useState('');
 
     useEffect(() => {
+        console.log(apiUrl)
         teacherExams();
     }, []);
 
     const teacherExams = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/exams', config);
+            const response = await axios.get(`${apiUrl}/exams`, config); 
             console.log('Fetched exams:', response.data);
             setExams(response.data);
         } catch (error) {
@@ -38,8 +41,11 @@ function TeacherInterface() {
     };
 
     const handleSearch = (query) => {
+        setSearchQuery(query);
+
+        // Filter exams based on the exam name
         const filtered = exams.filter((exam) => {
-            return exam.examID.toString().toLowerCase().includes(query.toLowerCase());
+            return exam.examName.toLowerCase().includes(query.toLowerCase());
         });
         setFilteredExams(filtered);
         setSearchClicked(true);
@@ -56,7 +62,7 @@ function TeacherInterface() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/exams', examData, config);
+            const response = await axios.post(`${apiUrl}/exams`, examData, config);
             console.log('Exam added:', response.data);
             localStorage.setItem("ExamID", response.data.examID)
 
@@ -71,6 +77,9 @@ function TeacherInterface() {
         localStorage.setItem("ExamID", pExamID);
         localStorage.setItem("examName", pExamName);
         navigate('/addExam');
+        // localStorage.setItem('viewSummaryExamID', examID);
+        // localStorage.setItem('viewSummaryUserID', userID);
+        // navigate('/examPaperSummary');
     };
 
 

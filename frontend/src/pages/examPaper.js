@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function ExamPaper() {
-
+    const apiUrl = process.env.REACT_APP_API_BASE_URL;
     const token = localStorage.getItem('token');
     const config = {
         headers: {
@@ -31,7 +31,7 @@ function ExamPaper() {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/questions', config);
+            const response = await axios.get(`${apiUrl}/questions`, config);
 
             // Filter questions based on examID
             const filteredQuestions = response.data.filter((question) => question.examID == examID);
@@ -49,7 +49,7 @@ function ExamPaper() {
 
     const fetchAnswers = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/answers', config);
+            const response = await axios.get(`${apiUrl}/answers`, config);
             const filteredAnswers = response.data.filter((answer) => answer.questionID == questionID);
 
             setAnswers(response.data);
@@ -65,15 +65,15 @@ function ExamPaper() {
     const nextQuestion = async () => {
 
         try {
-            const response = await axios.post('http://localhost:3000/student-answer', {
+            const response = await axios.post(`${apiUrl}/student-answer`, {
                 questionID: selectedAnswer.questionID,
                 answerID: selectedAnswer.answerID,
             }, config);
 
-            const correctAnswerResponse = await axios.get('http://localhost:3000/answers', config);
+            const correctAnswerResponse = await axios.get(`${apiUrl}/answers`, config);
             console.log(correctAnswerResponse);
 
-            const questionResponse = await axios.get(`http://localhost:3000/questions/exam/${examID}`, config).then((res) => {
+            const questionResponse = await axios.get(`${apiUrl}/questions/exam/${examID}`, config).then((res) => {
                 return res.data
             })
 

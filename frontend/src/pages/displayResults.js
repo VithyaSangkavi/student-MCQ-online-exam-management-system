@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function DisplayResults() {
-
+    const apiUrl = process.env.REACT_APP_API_BASE_URL;
     const navigate = useNavigate('');
 
     const token = localStorage.getItem('token');
@@ -85,7 +85,7 @@ function DisplayResults() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/results', resultsData, config);
+            const response = await axios.post(`${apiUrl}/results`, resultsData, config);
             console.log('Results added:', response.data);
 
             navigate('/studentInterface');

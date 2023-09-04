@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function AddExam() {
+    const apiUrl = process.env.REACT_APP_API_BASE_URL;
     const navigate = useNavigate();
 
     const token = localStorage.getItem('token');
@@ -36,7 +37,7 @@ function AddExam() {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/questions', config);
+            const response = await axios.get(`${apiUrl}/questions`, config);
             // console.log('Fetched questions:', response.data);
             setQuestions(response.data);
         } catch (error) {
@@ -50,7 +51,7 @@ function AddExam() {
 
     const fetchAnswers = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/answers', config);
+            const response = await axios.get(`${apiUrl}/answers`, config);
             // console.log('Fetched answers:', response.data);
             setAnswers(response.data);
         } catch (error) {
@@ -83,6 +84,12 @@ function AddExam() {
         // console.log('Answer Values:', answerValue);
         // console.log('Correct Answer:', correctAnswer);
 
+        // select correct answer select validation
+        if (correctAnswer === -1) {
+            alert('Please select the correct answer before adding the question.');
+            return;
+        }
+
         try {
             const questionData = {
                 questionText: questionText,
@@ -90,7 +97,7 @@ function AddExam() {
                 questionNo: questionNo
             };
 
-            const response = await axios.post('http://localhost:3000/questions', questionData, config);
+            const response = await axios.post(`${apiUrl}/questions`, questionData, config);
             console.log('Question added:', response.data);
 
             const questionID = response.data.questionID;
@@ -101,7 +108,7 @@ function AddExam() {
                     questionID: questionID,
                     correctAnswer: index === correctAnswer
                 };
-                return axios.post('http://localhost:3000/answers', answerData, config);
+                return axios.post(`${apiUrl}/answers`, answerData, config);
             });
 
             const responses = await Promise.all(answerPromises);
@@ -121,9 +128,21 @@ function AddExam() {
     //Add exam 
 
     const handleAddExam = async () => {
+        //exam name validation
+        if (!examName.trim()) {
+            alert('Please provide an exam name before publishing.');
+            return;
+        }
+
+        //correct answer select validation
+        if (questions.some((question) => question.examID == examID && question.correctAnswer === -1)) {
+            alert('Please select the correct answer for all questions before adding the exam.');
+            return;
+        }
+
         try {
             const examData = {
-           
+
                 examName: examName,
                 startDateAndTime: startDateAndTime,
                 duration: duration,
@@ -131,7 +150,7 @@ function AddExam() {
                 userID: userID
             };
 
-            const response = await axios.put(`http://localhost:3000/exams/${examID}`, examData, config);
+            const response = await axios.put(`${apiUrl}/exams/${examID}`, examData, config);
             console.log('Exam added:', response.data);
         } catch (error) {
             console.error('Error adding exam:', error);
@@ -146,6 +165,12 @@ function AddExam() {
 
     //saving the exam without publishing
     const saveExam = async () => {
+        //exam name validation
+        if (!examName.trim()) {
+            alert('Please provide an exam name before saving.');
+            return;
+        }
+
         try {
             const examData = {
                 examName: examName,
@@ -155,7 +180,7 @@ function AddExam() {
                 userID: userID
             };
 
-            const response = await axios.post('http://localhost:3000/exams', examData, config);
+            const response = await axios.post(`${apiUrl}/exams`, examData, config);
             console.log('Exam added:', response.data);
         } catch (error) {
             console.error('Error adding exam:', error);
@@ -251,7 +276,7 @@ function AddExam() {
                                         checked={correctAnswer === index}
                                         onChange={() => handleCorrectAnswerChange(index)}
                                     />
-                                   
+
                                 </div>
                             ))}
                         </div>

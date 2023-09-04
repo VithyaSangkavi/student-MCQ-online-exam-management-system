@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function LoginForm() {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://localhost:3000/users/login', {
+      const response = await axios.post(`${apiUrl}/users/login`, {
         userEmail: email,
         password: password,
       });
@@ -37,6 +38,8 @@ function LoginForm() {
           console.log('Login unsuccessful: Unknown userType', data.userType);
           alert('Invalid Login');
         }
+
+        window.location.reload();
       } else {
         console.error('Login error:', response.data);
         alert('Invalid Login');
