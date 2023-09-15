@@ -21,6 +21,7 @@ const authenticate = async (req, res, next) => {
     req.user = {
       id: user.id,
       userType: user.userType,
+      userID: user.userID
     };
 
     next();
