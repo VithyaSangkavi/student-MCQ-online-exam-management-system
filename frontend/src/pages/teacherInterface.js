@@ -7,8 +7,11 @@ import { useNavigate } from 'react-router-dom';
 
 function TeacherInterface() {
     const navigate = useNavigate();
+    
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
+    //Header configuration
     const token = localStorage.getItem('token');
     const config = {
         headers: {
@@ -16,6 +19,7 @@ function TeacherInterface() {
         }
     }
 
+    //Declaring states
     const [exams, setExams] = useState([]);
     const [filteredExams, setFilteredExams] = useState([]);
     const [searchClicked, setSearchClicked] = useState(false);
@@ -24,12 +28,30 @@ function TeacherInterface() {
     const [examName, setExamName] = useState('');
     const [startDateAndTime, setStartDateAndTime] = useState('');
     const [duration, setDuration] = useState('');
+    const [userInfo, setUserInfo] = useState(null); 
 
+    //Get userID from the authenticate middleware
     useEffect(() => {
-        console.log(apiUrl)
+        const fetchUserInfo = async () => {
+            try {
+                const userResponse = await axios.get(`${apiUrl}/users/userinfo`, config);
+
+                if (userResponse.status === 200) {
+                    console.log('Auth id: ', userResponse.data)
+                    setUserInfo(userResponse.data);
+                }
+            } catch (error) {
+                console.error('Error fetching user information:', error);
+            }
+        };
+
+        // Call the function to fetch user info
+        fetchUserInfo();
+
         teacherExams();
     }, []);
 
+    //Fetch exams
     const teacherExams = async () => {
         try {
             const response = await axios.get(`${apiUrl}/exams`, config); 
@@ -40,6 +62,7 @@ function TeacherInterface() {
         }
     };
 
+    //Handle search exam
     const handleSearch = (query) => {
         setSearchQuery(query);
 
@@ -51,8 +74,11 @@ function TeacherInterface() {
         setSearchClicked(true);
     };
     
+    //Create new exam
     const createExam = async () => {
-        const userID = localStorage.getItem('userID')
+        // const userID = localStorage.getItem('userID')
+        const userID = userInfo;
+        
         try {
             const examData = {
                 examName: null,
@@ -73,6 +99,7 @@ function TeacherInterface() {
         }
     };
 
+    //View a particular exam
     const viewExam = (pExamID, pExamName) => {
         localStorage.setItem("ExamID", pExamID);
         localStorage.setItem("examName", pExamName);

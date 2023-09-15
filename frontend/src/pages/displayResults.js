@@ -3,9 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function DisplayResults() {
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
     const navigate = useNavigate('');
 
+    //Header configuration
     const token = localStorage.getItem('token');
     const config = {
         headers: {
@@ -13,6 +16,7 @@ function DisplayResults() {
         }
     }
 
+    //Declaring states
     const [answerArray, setAnswerArray] = useState(localStorage.getItem("AnswerArray"));
     const [noOfQuestions, setNoOfQuestions] = useState(localStorage.getItem("NoOfQuestions"));
     const [formatedMarks, setFormatedMarks] = useState(0);
@@ -22,7 +26,26 @@ function DisplayResults() {
 
     const [questionResults, setQuestionResults] = useState({});
     
+    const [userInfo, setUserInfo] = useState(null); 
+
+    //Getting the userID from the authenticate middleware
     useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const userResponse = await axios.get(`${apiUrl}/users/userinfo`, config);
+
+                if (userResponse.status === 200) {
+                    // console.log('Auth id: ', userResponse.data)
+                    setUserInfo(userResponse.data);
+                }
+            } catch (error) {
+                console.error('Error fetching user information:', error);
+            }
+        };
+
+        // Call the function to fetch user info
+        fetchUserInfo();
+
         const unfilteredArray = answerArray.split(',');
         console.log('unfilter '+unfilteredArray)
         const array = unfilteredArray.filter(item => item !== null);
@@ -36,11 +59,13 @@ function DisplayResults() {
             }
         })
 
+        //Calculate marks
         let marks = count / parseInt(noOfQuestions) * 100;
         let formatedMarks = parseFloat(marks.toFixed(2))
         setFormatedMarks(formatedMarks)
         console.log(formatedMarks)
 
+        //Assign grade for the obtained marks
         let calculatedGrade = "";
         if (formatedMarks >= 85 && formatedMarks <= 100) {
             calculatedGrade = "A";
@@ -54,6 +79,7 @@ function DisplayResults() {
 
         setCalculatedGrade(calculatedGrade);
 
+        //Display results
         let results = "";
         if (calculatedGrade == "A" || calculatedGrade == "B" || calculatedGrade == "C") {
             results = "Passed";
@@ -74,8 +100,10 @@ function DisplayResults() {
 
     }, [answerArray, noOfQuestions]);
 
+    //Add student results to the results table
     const addResults = async () => {
-        const userID = localStorage.getItem('userID');
+        // const userID = localStorage.getItem('userID');
+        const userID = userInfo;
         const examID = localStorage.getItem('StuExamID')
         try {
             const resultsData = {

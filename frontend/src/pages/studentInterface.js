@@ -3,26 +3,51 @@ import axios from 'axios';
 import SearchBar from '../components/searchBar';
 import { useNavigate } from 'react-router-dom';
 
+
 function StudentInterface() {
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
+    //Header configuration
     const token = localStorage.getItem('token');
     const config = {
         headers: {
-            'Authorization' : `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
         }
     }
 
+    //Declaring states
     const [exams, setExams] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredExams, setFilteredExams] = useState([]);
     const [searchClicked, setSearchClicked] = useState(false);
 
+    const [examStatuses, setExamStatuses] = useState({});
+    const [userInfo, setUserInfo] = useState(null); 
+    const [nowDate] = useState(new Date());
+
     const navigate = useNavigate('');
 
+    //Get userID from the authenticate middleware
     useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const userResponse = await axios.get(`${apiUrl}/users/userinfo`, config);
+
+                if (userResponse.status === 200) {
+                    console.log('Auth id: ', userResponse.data)
+                    setUserInfo(userResponse.data);
+                }
+            } catch (error) {
+                console.error('Error fetching user information:', error);
+            }
+        };
+        
+        fetchUserInfo();
         fetchExams();
     }, []);
 
+    //Fetch exams
     const fetchExams = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -32,16 +57,31 @@ function StudentInterface() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            
+
             console.log('Fetched exams:', response.data);
+            console.log("respones: ", response.data.startDateAndTime)
+            console.log("State: ", nowDate)
 
             const publishedExams = response.data.filter(exam => exam.examStatus === 'Published');
             setExams(publishedExams);
+
+            // Fetch exam statuses from the results table
+            const examStatusData = await axios.get(`${apiUrl}/results`, config);
+            const examStatusesMap = {};
+
+            // Create a map of examID to exam status
+            examStatusData.data.forEach(result => {
+                examStatusesMap[result.examID] = examStatusesMap[result.examID] || {};
+                examStatusesMap[result.examID][result.userID] = 'Completed';
+            });
+
+            setExamStatuses(examStatusesMap);
         } catch (error) {
             console.error('Error fetching exams:', error);
         }
     };
 
+    //Handle search exams
     const handleSearch = (query) => {
         setSearchQuery(query);
 
@@ -53,52 +93,67 @@ function StudentInterface() {
         setSearchClicked(true);
     };
 
+    //View a particular exam
     const viewExam = async (pExamID) => {
-        localStorage.setItem("StuExamID", pExamID);
-    
-        try {
-            const response = await axios.get(`${apiUrl}/exam-time`, config);
-            console.log('Fetched exam time:', response.data);
-    
-            const userID = localStorage.getItem('userID');
-            const examID = localStorage.getItem('StuExamID');
-    
-            console.log('User ID:', userID);
-            console.log('Exam ID:', examID);
-    
-            if (response.data.userID === userID && response.data.examID === examID) {
-                navigate('/examPaper');
-            } else {
-                const currentDateTime = new Date();
-    
-                try {
-                    const examResponse = await axios.get(`${apiUrl}/exams/${examID}`, config);
-                    const examDurationInMinutes = examResponse.data.duration;
+        //const userID = localStorage.getItem('userID');
+        const userID = userInfo;
+        console.log('View Exam user id: ', userID)
 
-                    const examEndTime = new Date(currentDateTime.getTime() + (examDurationInMinutes * 60000)); // 60000 milliseconds in a minute
-    
-                    const examTimeData = {
-                        examStartTime: currentDateTime,
-                        examEndTime: examEndTime,
-                        userID: userID,
-                        examID: examID
-                    };
-    
-                    const examTimeResponse = await axios.post(`${apiUrl}/exam-time`, examTimeData, config);
-                    console.log('Exam time added:', examTimeResponse.data);
-    
-                    localStorage.setItem('endTime', examEndTime);
-                    
+        const examID = localStorage.getItem('StuExamID');
+
+        // Check if the user has already completed the exam based on examID
+        if (
+            examStatuses[pExamID] &&
+            examStatuses[pExamID][userID] &&
+            examStatuses[pExamID][userID] === 'Completed'
+        ) {
+            localStorage.setItem('StuExamID', pExamID);
+
+            console.log('User has already completed this exam');
+            navigate(`/studentResults/${pExamID}/${userID}`);
+        } else {
+            localStorage.setItem('StuExamID', pExamID);
+
+            try {
+                const response = await axios.get(`${apiUrl}/exam-time`, config);
+                console.log('Fetched exam time:', response.data);
+
+                console.log('User ID:', userID);
+                console.log('Exam ID:', examID);
+
+                if (response.data.userID === userID && response.data.examID === examID) {
                     navigate('/examPaper');
-                } catch (error) {
-                    console.error('Error adding exam time:', error);
+                } else {
+                    const currentDateTime = new Date();
+
+                    try {
+                        const examResponse = await axios.get(`${apiUrl}/exams/${examID}`, config);
+                        const examDurationInMinutes = examResponse.data.duration;
+
+                        const examEndTime = new Date(currentDateTime.getTime() + (examDurationInMinutes * 60000)); // 60000 milliseconds in a minute
+
+                        const examTimeData = {
+                            examStartTime: currentDateTime,
+                            examEndTime: examEndTime,
+                            userID: userID,
+                            examID: examID
+                        };
+
+                        const examTimeResponse = await axios.post(`${apiUrl}/exam-time`, examTimeData, config);
+                        console.log('Exam time added:', examTimeResponse.data);
+
+                        localStorage.setItem('endTime', examEndTime);
+
+                        navigate('/examPaper');
+                    } catch (error) {
+                        console.error('Error adding exam time:', error);
+                    }
                 }
+            } catch (error) {
+                console.error('Error fetching exam time:', error);
             }
-        } catch (error) {
-            console.error('Error fetching exam time:', error);
         }
     };
-    
 
     return (
         <>
@@ -121,10 +176,17 @@ function StudentInterface() {
                     <tbody>
                         {(searchClicked ? filteredExams : exams).map((exam) => (
                             <tr key={exam.id} className="border-2">
-                                <button onClick={() => { viewExam(exam.examID) }}> <td className="py-2 px-4">{exam.examName}</td> </button>
+                                <button disabled={new Date(exam.startDateAndTime) < nowDate ? false : true} onClick={() => { viewExam(exam.examID) }}> <td className="py-2 px-4">{exam.examName}</td> </button>
                                 <td className="py-2 px-4">{exam.startDateAndTime}</td>
                                 <td className="py-2 px-4">{exam.duration} minutes</td>
-                                <td className="py-2 px-4">{exam.examStatus}</td>
+                                <td className="py-2 px-4">
+                                    {examStatuses[exam.examID] && examStatuses[exam.examID][localStorage.getItem('userID')] ? (
+                                        <span className="text-green-600">Completed</span>
+                                    ) : (
+                                        <span className="text-blue-600">Pending</span>
+                                    )}
+                                </td>
+
                             </tr>
                         ))}
                     </tbody>

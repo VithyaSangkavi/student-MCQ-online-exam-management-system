@@ -3,7 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function ExamPaper() {
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
+    //Header configuration
     const token = localStorage.getItem('token');
     const config = {
         headers: {
@@ -11,6 +14,7 @@ function ExamPaper() {
         }
     }
 
+    //Declaring states
     const [examID, setExamID] = useState(localStorage.getItem("StuExamID"));
     const [questionNo, setQuestionNo] = useState(1);
     const [selectedAnswer, setSelectedAnswer] = useState({ questionID: null, answerID: null });
@@ -19,12 +23,14 @@ function ExamPaper() {
 
     const [examEnded, setExamEnded] = useState(false);
 
+    const [questions, setQuestions] = useState([]);
+    const [answers, setAnswers] = useState([]);
+    
+    const [countdown, setCountdown] = useState(null);
+
     const navigate = useNavigate();
 
     //Fetch Questions
-
-    const [questions, setQuestions] = useState([]);
-
     useEffect(() => {
         fetchQuestions();
     }, [questions]);
@@ -44,9 +50,6 @@ function ExamPaper() {
 
 
     //Fetch Answers
-
-    const [answers, setAnswers] = useState([]);
-
     const fetchAnswers = async () => {
         try {
             const response = await axios.get(`${apiUrl}/answers`, config);
@@ -62,6 +65,7 @@ function ExamPaper() {
         fetchAnswers();
     }, [answers])
 
+    //Next question button
     const nextQuestion = async () => {
 
         try {
@@ -126,7 +130,7 @@ function ExamPaper() {
         }
     };
 
-
+    //Previous question button
     const prevQuestion = () => {
         if (questionNo > 1) {
             setQuestionNo(questionNo - 1);
@@ -141,9 +145,6 @@ function ExamPaper() {
     }
 
     //Time
-
-    const [countdown, setCountdown] = useState(null);
-
     useEffect(() => {
         const fetchTargetTimeFromDatabase = async () => {
             try {
@@ -193,8 +194,6 @@ function ExamPaper() {
                 ${minutes.toString().padStart(2, '0')}:
                 ${seconds.toString().padStart(2, '0')}`;
     };
-
-
 
     return (
         <>

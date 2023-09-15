@@ -3,7 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function ExamPaperSummary() {
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
+    //Header Configuration
     const token = localStorage.getItem('token');
     const config = {
         headers: {
@@ -13,6 +16,7 @@ function ExamPaperSummary() {
 
     const navigate = useNavigate();
 
+    //Declaring states
     const [studentsCount, setStudentsCount] = useState(0);
     const [completedStudentsCount, setCompletedStudentsCount] = useState(0);
     const [attendingStudents, setAttendingStudents] = useState([]);
@@ -72,7 +76,7 @@ function ExamPaperSummary() {
             });
     }, []);
 
-    
+    //Delete exam function
     const deleteExam = async () => {
         console.log(examID)
         try {
@@ -86,6 +90,7 @@ function ExamPaperSummary() {
         }
     };
 
+    //Formatting time
     const formatTime = (timeInMilliseconds) => {
         const date = new Date(timeInMilliseconds);
         let hours = date.getHours();

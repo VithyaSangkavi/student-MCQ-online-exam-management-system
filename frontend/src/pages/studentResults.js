@@ -3,11 +3,14 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 function StudentResults() {
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
+    //Declaring state
+    const [examResults, setExamResults] = useState([]);
+
     const userID = localStorage.getItem('userID');
     const examID = localStorage.getItem('StuExamID');
-
-    const [examResults, setExamResults] = useState([]);
 
     useEffect(() => {
         // Fetch all results
@@ -40,6 +43,7 @@ function StudentResults() {
         fetchResults();
     }, [apiUrl, examID, userID]);
 
+    //Assign grade based on the obtained marks
     const calculateGrade = (marks) => {
         if (marks >= 85 && marks <= 100) {
             return 'A';
@@ -59,22 +63,22 @@ function StudentResults() {
 
     return (
         <div className="flex justify-center h-[400px] mt-[50px]">
-        <div className="border border-gray-300 p-6 rounded-lg mt-[20px]">
-            <h1 className='text-red-600'>Only one attempt is allowed. You already completed this exam</h1><br/><br/>
-            <h1 className="text-2xl font-bold mb-4">Your Results</h1>
-            <ul className="list-disc pl-6">
-                {examResults.map((result) => (
-                    <h1 key={result.id} className="mb-4">
-                    <p className="text-xl border p-2">Marks: {result.marks}</p><br/>
-                    <p className="text-xl border p-2">Grade: {calculateGrade(result.marks)}</p><br/>
-                    <p className={`text-2xl font-bold border p-2 ${isPassed(result.marks) ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPassed(result.marks) ? 'Status: Passed' : 'Status: Failed'}
-                    </p>
-                </h1>
-                ))}
-            </ul>
+            <div className="border border-gray-300 p-6 rounded-lg mt-[20px]">
+                <h1 className='text-red-600'>Only one attempt is allowed. You already completed this exam</h1><br /><br />
+                <h1 className="text-2xl font-bold mb-4">Your Results</h1>
+                <ul className="list-disc pl-6">
+                    {examResults.map((result) => (
+                        <h1 key={result.id} className="mb-4">
+                            <p className="text-xl border p-2">Marks: {result.marks}</p><br />
+                            <p className="text-xl border p-2">Grade: {calculateGrade(result.marks)}</p><br />
+                            <p className={`text-2xl font-bold border p-2 ${isPassed(result.marks) ? 'text-green-600' : 'text-red-600'}`}>
+                                {isPassed(result.marks) ? 'Status: Passed' : 'Status: Failed'}
+                            </p>
+                        </h1>
+                    ))}
+                </ul>
+            </div>
         </div>
-    </div>
     );
 }
 
