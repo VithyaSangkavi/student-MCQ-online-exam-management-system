@@ -10,6 +10,7 @@ import DisplayResults from "./pages/displayResults";
 import ExamPaperSummary from "./pages/examPaperSummary";
 import Navbar from "./components/NavBar";
 import FrontPage from "./pages/frontPage";
+import StudentResults from "./pages/studentResults";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/examPaper" element={<ExamPaper />} />
           <Route path="/displayResults" element={<DisplayResults />} />
           <Route path="examPaperSummary" element={<ExamPaperSummary />} />
+          <Route path="/studentResults/:examID/:userID" element={<StudentResults />} />
         </Routes>
       </Router>
     </>
