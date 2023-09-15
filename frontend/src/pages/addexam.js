@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function AddExam() {
+    //Getting the localhost url from .env
     const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
     const navigate = useNavigate();
 
+    //Header configuration
     const token = localStorage.getItem('token');
     const config = {
         headers: {
@@ -13,6 +16,7 @@ function AddExam() {
         }
     }
 
+    //Declaring states
     const [userID, setUserID] = useState(localStorage.getItem("userID"));
     const [examID, setExamID] = useState(localStorage.getItem("ExamID"));
     const [examName, setExamName] = useState('');
@@ -25,12 +29,17 @@ function AddExam() {
     const [answerValue, setAnswerValue] = useState(['', '', '', '']);
     const [correctAnswer, setCorrectAnswer] = useState(-1);
 
+    const [selectedQuestion, setSelectedQuestion] = useState(null);
+    const [selectedAnswers, setSelectedAnswers] = useState([]);
+    const [selectedQuestionID, setSelectedQuestionID] = useState('');
+    const [selectedAnswerID, setSelectedAnswerID] = useState([]);
+    
+    const [questions, setQuestions] = useState([]);
+    const [answers, setAnswers] = useState([]);
+    
     const thisExamName = localStorage.getItem("examName");
 
     //Fetch Questions
-
-    const [questions, setQuestions] = useState([]);
-
     useEffect(() => {
         fetchQuestions();
     }, [questions]);
@@ -46,9 +55,6 @@ function AddExam() {
     };
 
     //Fetch Answers
-
-    const [answers, setAnswers] = useState([]);
-
     const fetchAnswers = async () => {
         try {
             const response = await axios.get(`${apiUrl}/answers`, config);
@@ -64,19 +70,18 @@ function AddExam() {
     }, [answers])
 
     //Handle answers 
-
     const handleAnswerChange = (index, value) => {
         const newAnswerValue = [...answerValue];
         newAnswerValue[index] = value;
         setAnswerValue(newAnswerValue);
     };
 
+    //Handle correct answer
     const handleCorrectAnswerChange = (index) => {
         setCorrectAnswer((prevIndex) => (prevIndex === index ? -1 : index));
     };
 
     //Add questions and answers
-
     const handleAddQuestion = async (e) => {
         e.preventDefault();
 
@@ -126,7 +131,6 @@ function AddExam() {
 
 
     //Add exam 
-
     const handleAddExam = async () => {
         //exam name validation
         if (!examName.trim()) {
@@ -195,6 +199,70 @@ function AddExam() {
         navigate('/examPaperSummary');
     }
 
+    //Clickable table row to fetch questions and answers
+    const handleTableRowClick = (question) => {
+        setSelectedQuestion(question);
+        const questionAnswers = answers.filter((answer) => answer.questionID === question.questionID);
+        setSelectedAnswers(questionAnswers);
+        setQuestionText(question.questionText);
+
+        setSelectedQuestionID(question.questionID);
+        setSelectedAnswerID(questionAnswers);
+
+        console.log('QuestionID : ', question.questionID)
+        console.log('AnswerID : ', questionAnswers)
+
+        setCorrectAnswer(-1); // Reset the correct answer selection
+        setAnswerValue(questionAnswers.map((answer) => answer.answerValue));
+    };
+    
+    //Handle edit question
+    const handleEditQuestion = async (e) => {
+        e.preventDefault();
+
+        // select correct answer select validation
+        if (correctAnswer === -1) {
+            alert('Please select the correct answer before adding the question.');
+            return;
+        }
+
+        try {
+            const questionData = {
+                questionText: questionText,
+                examID: examID,
+                questionNo: questionNo
+            };
+
+            const response = await axios.put(`${apiUrl}/questions/${selectedQuestionID}`, questionData, config);
+            console.log('Question edited:', response.data);
+
+            const questionID = response.data.questionID;
+            console.log(answerValue)
+
+            const answerPromises = answerValue.map((answer, index) => {
+                console.log('Checking........')
+                const answerData = {
+                    answerValue: answer,
+                    questionID: questionID,
+                    correctAnswer: index === correctAnswer
+                };
+                console.log(selectedAnswerID[index])
+                return axios.put(`${apiUrl}/answers/${selectedAnswerID[index].answerID}`, answerData, config);
+            });
+
+            const responses = await Promise.all(answerPromises);
+            console.log('Answers edited:', responses.map((response) => response.data));
+
+            setQuestionNo(questionNo + 1);
+        } catch (error) {
+            console.error('Error editing question and answer:', error);
+        }
+
+        setAnswerValue(['', '', '', '']);
+        setQuestionText('');
+        setCorrectAnswer(-1)
+    };
+
     return (
         <>
             <div className="flex">
@@ -217,7 +285,7 @@ function AddExam() {
                             </thead>
                             <tbody>
                                 {questions.map((question, index) => (question.examID && question.examID == examID ? (
-                                    <tr key={question.id}>
+                                    <tr key={question.id} onClick={() => handleTableRowClick(question)}>
                                         <td className="p-2 border-t border-gray-300">
                                             {question.questionNo})   {question.questionText}
                                         </td>
@@ -254,7 +322,7 @@ function AddExam() {
                 <div className="w-1/3 bg-white p-4">
                     <form className="border-2 p-[20px] h-[550px]">
                         <div className="mb-3">
-                            <input type="text" className="w-full border border-gray-300 px-3 py-2 rounded" placeholder="Question name" value={questionText} onChange={(e) => setQuestionText(e.target.value)} />
+                            <input type="text" className="w-full border border-gray-300 px-3 py-2 rounded" placeholder="Question name"  value={selectedQuestion ? selectedQuestion.questionText : questionText} onChange={(e) => {setQuestionText(e.target.value); setSelectedQuestion(e.target.value)}} />
                         </div>
                         <br />
 
@@ -267,7 +335,7 @@ function AddExam() {
                                         id={`answer${index + 1}`}
                                         className={`w-full border border-gray-300 px-3 py-2 rounded ${correctAnswer === index ? 'bg-green-100' : ''}`}
                                         placeholder={`Answer ${index + 1}`}
-                                        value={value}
+                                        value={selectedQuestion ? answerValue[index] : value}
                                         onChange={(e) => handleAnswerChange(index, e.target.value)}
                                     />
                                     <input
@@ -281,9 +349,10 @@ function AddExam() {
                             ))}
                         </div>
 
-
                         <br /> <br /> <br />
+                        
                         <button type="submit" onClick={handleAddQuestion} className="bg-[#31C48D] text-white font-bold px-4 py-2 rounded float-right">Save</button>
+                        <button type="submit" onClick={handleEditQuestion} className="bg-[#FACA15] text-white font-bold px-4 py-2 rounded float-right mr-2">Edit</button>
                     </form>
                     <br />
                     <button type="submit" onClick={viewSummary} className='bg-[blue] text-white  font-bold px-4 py-2 rounded float-right'>View Summary</button>
