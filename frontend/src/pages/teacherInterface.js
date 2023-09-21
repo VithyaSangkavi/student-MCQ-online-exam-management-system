@@ -30,24 +30,7 @@ function TeacherInterface() {
     const [duration, setDuration] = useState('');
     const [userInfo, setUserInfo] = useState(null); 
 
-    //Get userID from the authenticate middleware
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const userResponse = await axios.get(`${apiUrl}/users/userinfo`, config);
-
-                if (userResponse.status === 200) {
-                    console.log('Auth id: ', userResponse.data)
-                    setUserInfo(userResponse.data);
-                }
-            } catch (error) {
-                console.error('Error fetching user information:', error);
-            }
-        };
-
-        // Call the function to fetch user info
-        fetchUserInfo();
-
         teacherExams();
     }, []);
 
@@ -76,8 +59,7 @@ function TeacherInterface() {
     
     //Create new exam
     const createExam = async () => {
-        // const userID = localStorage.getItem('userID')
-        const userID = userInfo;
+        const userID = localStorage.getItem('userID')
         
         try {
             const examData = {
@@ -115,7 +97,6 @@ function TeacherInterface() {
             <div className="py-4 px-6 flex justify-between items-center">
                 <div className="flex items-center">
                     <SearchBar onSearch={handleSearch} />
-                    {/* <button className='rounded bg-[#5850EC] pr-10 pl-10 pt-2 pb-2 text-white h-[35px] font-bold ml-[15px]'>Search</button> */}
                 </div>
                 <button className="py-2 px-4 bg-[#31C48D] rounded text-white font-bold" onClick={createExam}> New Exam </button>
             </div>

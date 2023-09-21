@@ -30,21 +30,6 @@ function DisplayResults() {
 
     //Getting the userID from the authenticate middleware
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const userResponse = await axios.get(`${apiUrl}/users/userinfo`, config);
-
-                if (userResponse.status === 200) {
-                    // console.log('Auth id: ', userResponse.data)
-                    setUserInfo(userResponse.data);
-                }
-            } catch (error) {
-                console.error('Error fetching user information:', error);
-            }
-        };
-
-        // Call the function to fetch user info
-        fetchUserInfo();
 
         const unfilteredArray = answerArray.split(',');
         console.log('unfilter '+unfilteredArray)
@@ -102,8 +87,7 @@ function DisplayResults() {
 
     //Add student results to the results table
     const addResults = async () => {
-        // const userID = localStorage.getItem('userID');
-        const userID = userInfo;
+        const userID = localStorage.getItem('userID');
         const examID = localStorage.getItem('StuExamID')
         try {
             const resultsData = {

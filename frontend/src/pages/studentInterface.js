@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import SearchBar from '../components/searchBar';
 import { useNavigate } from 'react-router-dom';
+import { format } from "date-fns";
+
 
 
 function StudentInterface() {
@@ -28,22 +30,7 @@ function StudentInterface() {
 
     const navigate = useNavigate('');
 
-    //Get userID from the authenticate middleware
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const userResponse = await axios.get(`${apiUrl}/users/userinfo`, config);
-
-                if (userResponse.status === 200) {
-                    console.log('Auth id: ', userResponse.data)
-                    setUserInfo(userResponse.data);
-                }
-            } catch (error) {
-                console.error('Error fetching user information:', error);
-            }
-        };
-        
-        fetchUserInfo();
         fetchExams();
     }, []);
 
@@ -95,8 +82,7 @@ function StudentInterface() {
 
     //View a particular exam
     const viewExam = async (pExamID) => {
-        //const userID = localStorage.getItem('userID');
-        const userID = userInfo;
+        const userID = localStorage.getItem('userID');
         console.log('View Exam user id: ', userID)
 
         const examID = localStorage.getItem('StuExamID');
@@ -176,8 +162,9 @@ function StudentInterface() {
                     <tbody>
                         {(searchClicked ? filteredExams : exams).map((exam) => (
                             <tr key={exam.id} className="border-2">
-                                <button disabled={new Date(exam.startDateAndTime) < nowDate ? false : true} onClick={() => { viewExam(exam.examID) }}> <td className="py-2 px-4">{exam.examName}</td> </button>
-                                <td className="py-2 px-4">{exam.startDateAndTime}</td>
+                                <button disabled={new Date(exam.startDateAndTime) < nowDate ? false : true} onClick={() => { viewExam(exam.examID) }}
+                                className={new Date(exam.startDateAndTime) < nowDate ? 'text-black' : 'text-gray-400'}> <td className="py-2 px-4">{exam.examName}</td> </button>
+                                <td className="py-2 px-4">{format(new Date(exam.startDateAndTime), "EEE MMM dd yyyy HH:mm:ss")}</td>
                                 <td className="py-2 px-4">{exam.duration} minutes</td>
                                 <td className="py-2 px-4">
                                     {examStatuses[exam.examID] && examStatuses[exam.examID][localStorage.getItem('userID')] ? (

@@ -13,7 +13,7 @@ function StudentResults() {
     const examID = localStorage.getItem('StuExamID');
 
     useEffect(() => {
-        // Fetch all results
+        // Fetch all results + header configuration
         const fetchResults = async () => {
             try {
                 const token = localStorage.getItem('token');

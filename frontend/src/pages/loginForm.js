@@ -9,7 +9,7 @@ function LoginForm() {
   //Declaring states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -27,7 +27,7 @@ function LoginForm() {
         const thisUserName = data.user.userName;
 
         localStorage.setItem('token', data.token);
-       // localStorage.setItem('userID', data.user.userID);
+        localStorage.setItem('userID', data.user.userID);
         localStorage.setItem('userName', data.user.userName);
 
         // console.log('Login token:', data.token);

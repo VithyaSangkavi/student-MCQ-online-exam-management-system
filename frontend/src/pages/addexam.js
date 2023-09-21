@@ -120,6 +120,9 @@ function AddExam() {
             console.log('Answers added:', responses.map((response) => response.data));
 
             setQuestionNo(questionNo + 1);
+
+            setQuestionText('');
+            setSelectedQuestion('');
         } catch (error) {
             console.error('Error adding question:', error);
         }
@@ -254,6 +257,9 @@ function AddExam() {
             console.log('Answers edited:', responses.map((response) => response.data));
 
             setQuestionNo(questionNo + 1);
+
+            setQuestionText('');
+            setSelectedQuestion('');
         } catch (error) {
             console.error('Error editing question and answer:', error);
         }
