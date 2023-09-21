@@ -326,7 +326,7 @@ function AddExam() {
                 </div>
 
                 <div className="w-1/3 bg-white p-4">
-                    <form className="border-2 p-[20px] h-[550px]">
+                    <form className="border-2 p-[20px] h-[450px]">
                         <div className="mb-3">
                             <input type="text" className="w-full border border-gray-300 px-3 py-2 rounded" placeholder="Question name"  value={selectedQuestion ? selectedQuestion.questionText : questionText} onChange={(e) => {setQuestionText(e.target.value); setSelectedQuestion(e.target.value)}} />
                         </div>
@@ -355,10 +355,10 @@ function AddExam() {
                             ))}
                         </div>
 
-                        <br /> <br /> <br />
+                        <br />
                         
                         <button type="submit" onClick={handleAddQuestion} className="bg-[#31C48D] text-white font-bold px-4 py-2 rounded float-right">Save</button>
-                        <button type="submit" onClick={handleEditQuestion} className="bg-[#FACA15] text-white font-bold px-4 py-2 rounded float-right mr-2">Edit</button>
+                        <button type="submit" onClick={handleEditQuestion} className="bg-[#FACA15] text-white font-bold px-4 py-2 rounded float-right mr-6">Edit</button>
                     </form>
                     <br />
                     <button type="submit" onClick={viewSummary} className='bg-[blue] text-white  font-bold px-4 py-2 rounded float-right'>View Summary</button>

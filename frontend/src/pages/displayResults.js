@@ -25,8 +25,6 @@ function DisplayResults() {
     const [results, setResults] = useState('')
 
     const [questionResults, setQuestionResults] = useState({});
-    
-    const [userInfo, setUserInfo] = useState(null); 
 
     //Getting the userID from the authenticate middleware
     useEffect(() => {

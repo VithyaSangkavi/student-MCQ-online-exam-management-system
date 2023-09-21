@@ -25,7 +25,6 @@ function StudentInterface() {
     const [searchClicked, setSearchClicked] = useState(false);
 
     const [examStatuses, setExamStatuses] = useState({});
-    const [userInfo, setUserInfo] = useState(null); 
     const [nowDate] = useState(new Date());
 
     const navigate = useNavigate('');

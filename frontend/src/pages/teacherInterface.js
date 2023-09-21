@@ -28,7 +28,6 @@ function TeacherInterface() {
     const [examName, setExamName] = useState('');
     const [startDateAndTime, setStartDateAndTime] = useState('');
     const [duration, setDuration] = useState('');
-    const [userInfo, setUserInfo] = useState(null); 
 
     useEffect(() => {
         teacherExams();
