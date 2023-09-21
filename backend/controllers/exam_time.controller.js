@@ -2,7 +2,8 @@ const ExamTime  = require('../models/exam_time.js');
 
 const createExamTime = async (req, res) => {
   try {
-    const { timeID, examStartTime, examEndTime, userID} = req.body;
+    const { timeID, examStartTime, examEndTime} = req.body;
+    userID = req.user.userID;
     const newExamTime = await ExamTime.create({ timeID, examStartTime, examEndTime, userID });
     res.status(201).json(newExamTime);
   } catch (error) {

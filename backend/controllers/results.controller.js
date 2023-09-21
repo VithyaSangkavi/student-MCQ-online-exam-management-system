@@ -2,7 +2,8 @@ const Result = require('../models/results');
 
 const createResult = async (req, res) => {
   try {
-    const { resultsID, marks, examStatusStudent, examID, userID } = req.body;
+    const { resultsID, marks, examStatusStudent, examID } = req.body;
+    const userID = req.user.userID;
     const newResult = await Result.create({ resultsID, marks, examStatusStudent, examID, userID });
     
     //association with user and exam
